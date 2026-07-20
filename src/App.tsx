@@ -6,6 +6,7 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { SessionExplorerPage } from "@/pages/SessionExplorerPage";
 import { SessionInvestigationPage } from "@/pages/SessionInvestigationPage";
 import { ModulePlaceholder } from "@/pages/ModulePlaceholder";
+import { RuleStudioPage } from "@/pages/RuleStudioPage";
 import { NAV_MODULES } from "@/config/navigation";
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -30,15 +31,15 @@ export default function App() {
         <Route path="sessions" element={<SessionExplorerPage />} />
         <Route path="sessions/:id" element={<SessionInvestigationPage />} />
         <Route path="evidence" element={<ModulePlaceholder moduleId="evidence-explorer" />} />
-        <Route path="rules" element={<ModulePlaceholder moduleId="rule-studio" />} />
-        <Route path="plugins" element={<ModulePlaceholder moduleId="plugin-marketplace" />} />
+        <Route path="rules" element={<RuleStudioPage />} />
+        <Route path="plugins" element={<RuleStudioPage />} />
         <Route path="graph" element={<ModulePlaceholder moduleId="graph-intelligence" />} />
         <Route path="temporal" element={<ModulePlaceholder moduleId="temporal-intelligence" />} />
         <Route path="brain" element={<ModulePlaceholder moduleId="coherence-brain" />} />
         <Route path="replay" element={<ModulePlaceholder moduleId="replay-studio" />} />
         <Route path="model" element={<ModulePlaceholder moduleId="model-studio" />} />
         <Route path="copilot" element={<ModulePlaceholder moduleId="ai-copilot" />} />
-        <Route path="admin" element={<ModulePlaceholder moduleId="administration" />} />
+        <Route path="admin" element={<RuleStudioPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
