@@ -17,26 +17,73 @@ export function EChart({ option, className, style, onEvents }: ChartProps) {
 
   useEffect(() => {
     if (!ref.current) return;
-    const chart = echarts.init(ref.current, undefined, { renderer: "canvas" });
-    chartRef.current = chart;
-    return () => chart.dispose();
+    let chart: echarts.ECharts | null = null;
+    try {
+      chart = echarts.init(ref.current, undefined, { renderer: "canvas" });
+      chartRef.current = chart;
+    } catch (err) {
+      console.warn("EChart init warning:", err);
+    }
+
+    return () => {
+      try {
+        chart?.dispose();
+      } catch {
+        /* ignore dispose error */
+      }
+      chartRef.current = null;
+    };
   }, []);
 
   useEffect(() => {
     if (!chartRef.current) return;
-    chartRef.current.setOption({ ...baseOption(theme === "dark"), ...option }, { notMerge: false, lazyUpdate: true });
+    try {
+      chartRef.current.setOption({ ...baseOption(theme === "dark"), ...option }, { notMerge: false, lazyUpdate: true });
+    } catch (err) {
+      console.warn("EChart setOption warning:", err);
+    }
   }, [option, theme]);
 
   useEffect(() => {
     if (!chartRef.current || !onEvents) return;
-    Object.entries(onEvents).forEach(([evt, fn]) => chartRef.current?.on(evt, fn));
-    return () => Object.keys(onEvents).forEach((evt) => chartRef.current?.off(evt));
+    try {
+      Object.entries(onEvents).forEach(([evt, fn]) => chartRef.current?.on(evt, fn));
+    } catch (err) {
+      console.warn("EChart onEvents warning:", err);
+    }
+    return () => {
+      try {
+        Object.keys(onEvents ?? {}).forEach((evt) => chartRef.current?.off(evt));
+      } catch {
+        /* ignore off warning */
+      }
+    };
   }, [onEvents]);
 
   useEffect(() => {
-    const onResize = () => chartRef.current?.resize();
+    const el = ref.current;
+    if (!el) return;
+    const onResize = () => {
+      try {
+        chartRef.current?.resize();
+      } catch {
+        /* ignore resize error */
+      }
+    };
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(() => {
+        onResize();
+      });
+      ro.observe(el);
+    }
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      ro?.disconnect();
+    };
   }, []);
 
   return <div ref={ref} className={className} style={{ width: "100%", height: "100%", ...style }} />;

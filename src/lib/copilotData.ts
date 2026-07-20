@@ -45,14 +45,14 @@ export interface CopilotContext {
 const bullets = (items: string[]) => items.map((i) => `- ${i}`).join("\n");
 
 function topRules(s: LoginSession, n = 3): string[] {
-  return [...s.triggeredRules].slice(0, n);
+  return [...(s.triggeredRules ?? [])].slice(0, n);
 }
 
 function whyBlocked(s: LoginSession): { markdown: string; citations: { label: string; ref: string }[] } {
   const blocked = s.decision === "Deny";
   const rules = topRules(s);
   const reasons: string[] = [];
-  if (s.newDevice) reasons.push(`**First-seen device** — fingerprint \`${s.fingerprint.slice(0, 12)}\` has no trusted history (reputation 34/100).`);
+  if (s.newDevice) reasons.push(`**First-seen device** — fingerprint \`${(s.fingerprint ?? "").slice(0, 12)}\` has no trusted history (reputation 34/100).`);
   if (s.vpn) reasons.push(`**VPN / anonymizing IP** — ${s.ip} (${s.isp}, ${s.asn}) is a known VPN exit node.`);
   if (s.failedAttempts >= 3) reasons.push(`**Credential stuffing** — ${s.failedAttempts} failed attempts in the 1h window exceed the threshold of 3.`);
   if (s.velocityEvents > 10) reasons.push(`**Velocity spike** — ${s.velocityEvents} events in 1h vs a baseline of 4.`);
@@ -83,6 +83,8 @@ ${bullets(rules.length ? rules.map((r) => `\`${r}\``) : ["No rules fired"])}
 }
 
 function summarizeSession(s: LoginSession): { markdown: string; citations: { label: string; ref: string }[] } {
+  const triggeredCount = (s.triggeredRules ?? []).length;
+  const pluginCount = (s.pluginHits ?? []).length;
   const md = `## Session summary — ${s.sessionId}
 
 | Attribute | Value |
@@ -102,11 +104,11 @@ function summarizeSession(s: LoginSession): { markdown: string; citations: { lab
 ### Narrative
 
 - Session evaluated across **9 pipeline stages** in **${s.latency}ms** total.
-- **${s.triggeredRules.length}** rule${s.triggeredRules.length === 1 ? "" : "s"} fired; **${s.pluginHits.length}** plugin${s.pluginHits.length === 1 ? "" : "s"} contributed signals.
+- **${triggeredCount}** rule${triggeredCount === 1 ? "" : "s"} fired; **${pluginCount}** plugin${pluginCount === 1 ? "" : "s"} contributed signals.
 - ${s.newDevice ? "Device is **first-seen** with no trusted history." : "Device matches a trusted profile (47 prior logins)."}
 - ${s.vpn ? "IP is a **VPN exit node**." : "IP is a clean residential address."}
 `;
-  return { markdown: md, citations: [{ label: "Investigation case", ref: `CASE-${s.sessionId.replace("S-", "")}` }] };
+  return { markdown: md, citations: [{ label: "Investigation case", ref: `CASE-${(s.sessionId ?? "").replace("S-", "")}` }] };
 }
 
 function explainEvidence(s: LoginSession): { markdown: string; citations: { label: string; ref: string }[] } {
@@ -248,7 +250,7 @@ function compareSessions(ctx: CopilotContext): { markdown: string; citations: { 
     ["Country", a.country, b.country],
     ["Failed attempts", `${a.failedAttempts}`, `${b.failedAttempts}`],
     ["Velocity events", `${a.velocityEvents}`, `${b.velocityEvents}`],
-    ["Triggered rules", a.triggeredRules.join(", ") || "—", b.triggeredRules.join(", ") || "—"],
+    ["Triggered rules", (a.triggeredRules ?? []).join(", ") || "—", (b.triggeredRules ?? []).join(", ") || "—"],
   ];
   const md = `## Session comparison
 

@@ -11,6 +11,8 @@ import { CopilotPanel, CopilotDockEdge } from "@/components/copilot/CopilotPanel
 import { generateSessions } from "@/lib/mockData";
 import type { LoginSession } from "@/types";
 
+import { ErrorBoundary } from "./ErrorBoundary";
+
 const SESSIONS = generateSessions(200);
 
 export function AppLayout() {
@@ -67,16 +69,18 @@ export function AppLayout() {
             </div>
           </div>
           <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout" initial={false}>
               <motion.div
-                key={location.pathname.split("/")[1] || "dashboard"}
-                initial={{ opacity: 0, y: 6 }}
+                key={location.pathname}
+                initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
                 className="flex flex-1 flex-col h-full min-h-0 overflow-auto scrollbar-thin"
               >
-                <Outlet />
+                <ErrorBoundary key={location.pathname}>
+                  <Outlet />
+                </ErrorBoundary>
               </motion.div>
             </AnimatePresence>
           </div>
@@ -84,7 +88,9 @@ export function AppLayout() {
       </div>
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} onAction={handleAction} />
       {!copilotOpen && <CopilotDockEdge onOpen={() => setCopilotOpen(true)} />}
-      <CopilotPanel open={copilotOpen} onOpenChange={setCopilotOpen} contextSession={contextSession} variant="docked" />
+      <ErrorBoundary fallbackTitle="Copilot Error">
+        <CopilotPanel open={copilotOpen} onOpenChange={setCopilotOpen} contextSession={contextSession} variant="docked" />
+      </ErrorBoundary>
     </div>
   );
 }

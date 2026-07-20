@@ -12,8 +12,21 @@ import type { LoginSession } from "@/types";
 import { Badge } from "@/components/ui/badge";
 
 const SESSIONS = generateSessions(200);
-const HIGH_RISK = SESSIONS.find((s) => s.decision === "Deny") ?? SESSIONS[0];
-const COMPARE = SESSIONS.find((s) => s.decision === "Challenge" && s.sessionId !== HIGH_RISK.sessionId) ?? SESSIONS[1];
+const DEFAULT_SESSION: LoginSession = {
+  sessionId: "S-1001", customer: "Eleanor Voss", customerId: "CUST-9912", username: "e.voss",
+  decision: "Deny", status: "Blocked", riskScore: 88, coherenceScore: 32, fraudProbability: 91,
+  channel: "Web", application: "Retail Banking", device: "MacBook Pro 16\"", deviceType: "Desktop",
+  os: "macOS 14.5", browser: "Chrome 131", city: "Frankfurt", country: "Germany", countryCode: "DE",
+  latitude: 50.11, longitude: 8.68, ip: "185.220.101.4", asn: "AS2856", isp: "Deutsche Telekom",
+  loginTime: new Date().toISOString(), latency: 88, duration: 45, userAgent: "Mozilla/5.0",
+  fingerprint: "fp_a1b2c3d4e5f6", timezone: "Europe/Berlin", previousCountry: "United States",
+  previousCity: "New York", previousLoginTime: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
+  triggeredRules: ["R-117 Impossible Travel", "R-203 New Device"], pluginHits: ["GeoVelocity", "Device Intelligence"],
+  evidenceCount: 7, newDevice: true, vpn: true, mfaUsed: false, mfaType: "Authenticator App", authMethod: "Password + OTP",
+  failedAttempts: 3, velocityEvents: 12
+};
+const HIGH_RISK = SESSIONS.find((s) => s?.decision === "Deny") ?? SESSIONS[0] ?? DEFAULT_SESSION;
+const COMPARE = SESSIONS.find((s) => s?.decision === "Challenge" && s?.sessionId !== HIGH_RISK.sessionId) ?? SESSIONS[1] ?? DEFAULT_SESSION;
 
 const ICON_MAP: Record<CopilotSuggestion["icon"], React.ElementType> = {
   shield: ShieldAlert,

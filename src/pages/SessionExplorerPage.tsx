@@ -77,7 +77,7 @@ export function SessionExplorerPage() {
   const [selectedCount, setSelectedCount] = useState(0);
 
   const columnDefs = useMemo<ColDef<LoginSession>[]>(() => [
-    { headerName: "Session ID", field: "sessionId", cellRenderer: SessionIdCell, pinned: "left", width: 120, checkboxSelection: true, headerCheckboxSelection: true },
+    { headerName: "Session ID", field: "sessionId", cellRenderer: SessionIdCell, pinned: "left", width: 120 },
     { headerName: "Customer", field: "customer", width: 160, filter: "agTextColumnFilter" },
     { headerName: "Username", field: "username", width: 140, filter: "agTextColumnFilter" },
     { headerName: "Device", field: "device", cellRenderer: DeviceCell, width: 170, filter: "agSetColumnFilter" },
@@ -198,8 +198,7 @@ export function SessionExplorerPage() {
           onGridReady={onGridReady}
           onRowSelected={onRowSelected}
           onRowDoubleClicked={onRowDoubleClicked}
-          rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true }}
-          suppressRowClickSelection
+          rowSelection={{ mode: "multiRow", checkboxes: true, headerCheckbox: true, enableClickSelection: false }}
           animateRows
           rowHeight={40}
           headerHeight={38}
@@ -215,7 +214,7 @@ export function SessionExplorerPage() {
             hiddenByDefault: false,
           }}
           enableCharts
-          enableRangeSelection
+          cellSelection
           excelStyles={[
             { id: "header", font: { bold: true } },
           ]}

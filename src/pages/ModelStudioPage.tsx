@@ -29,16 +29,23 @@ const HEALTH_ICON: Record<ModelHealth, React.ElementType> = {
 };
 
 export function ModelStudioPage() {
-  const [selected, setSelected] = useState<RiskModel>(RISK_MODELS[0]);
+  const defaultModel = RISK_MODELS[0] ?? {
+    id: "wcm", name: "Weighted Coherence Model", kind: "weighted" as const, version: "v3.2",
+    accuracy: 0.942, precision: 0.918, recall: 0.904, roc: 0.961, trainingDate: "2026-06-12",
+    deploymentStatus: "production" as const, latencyMs: 12, health: "healthy" as const, description: "Default risk model",
+    color: "#0ea5e9", featureImportance: []
+  };
+  const [selected, setSelected] = useState<RiskModel>(defaultModel);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const stats = useMemo(() => ({
-    total: RISK_MODELS.length,
-    production: RISK_MODELS.filter((m) => m.deploymentStatus === "production").length,
-    avgRoc: (RISK_MODELS.reduce((a, m) => a + m.roc, 0) / RISK_MODELS.length).toFixed(3),
-    healthy: RISK_MODELS.filter((m) => m.health === "healthy").length,
-    avgLatency: Math.round(RISK_MODELS.reduce((a, m) => a + m.latencyMs, 0) / RISK_MODELS.length),
-  }), []);
+  const stats = useMemo(() => {
+    const total = RISK_MODELS.length || 1;
+    const production = RISK_MODELS.filter((m) => m?.deploymentStatus === "production").length;
+    const avgRoc = (RISK_MODELS.reduce((a, m) => a + (m?.roc ?? 0), 0) / total).toFixed(3);
+    const healthy = RISK_MODELS.filter((m) => m?.health === "healthy").length;
+    const avgLatency = Math.round(RISK_MODELS.reduce((a, m) => a + (m?.latencyMs ?? 0), 0) / total);
+    return { total: RISK_MODELS.length, production, avgRoc, healthy, avgLatency };
+  }, []);
 
   const rocOption = useMemo<EChartsOption>(() => ({
     tooltip: { trigger: "axis" },
@@ -205,18 +212,19 @@ function MiniMetric({ label, value, highlight }: { label: string; value: string;
 }
 
 function ModelDetail({ model, onSelect }: { model: RiskModel; onSelect: (m: RiskModel) => void }) {
+  const fiList = model?.featureImportance ?? [];
   const fiOption = useMemo<EChartsOption>(() => ({
     tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
     grid: { left: 120, right: 24, top: 8, bottom: 24, containLabel: false },
     xAxis: { type: "value", max: 1, axisLabel: { fontSize: 10 } },
-    yAxis: { type: "category", data: model.featureImportance.map((f) => f.feature).reverse(), axisLabel: { fontSize: 10, fontFamily: "monospace" } },
+    yAxis: { type: "category", data: fiList.map((f) => f.feature).reverse(), axisLabel: { fontSize: 10, fontFamily: "monospace" } },
     series: [{
       type: "bar",
       barWidth: "60%",
-      itemStyle: { color: model.color, borderRadius: [0, 4, 4, 0] },
-      data: model.featureImportance.map((f) => f.importance).reverse(),
+      itemStyle: { color: model?.color ?? "#0ea5e9", borderRadius: [0, 4, 4, 0] },
+      data: fiList.map((f) => f.importance).reverse(),
     }],
-  }), [model]);
+  }), [model, fiList]);
 
   return (
     <Card className="flex min-h-0 flex-col overflow-hidden p-0">
@@ -386,10 +394,13 @@ function DrawerStat({ label, value }: { label: string; value: string }) {
 /** Generate a synthetic ROC curve point cloud for a given AUC. */
 function rocCurve(auc: number): [number, number][] {
   const pts: [number, number][] = [];
-  const k = Math.max(1.2, 4 * auc); // steepness — higher AUC = sharper elbow
+  const validAuc = isNaN(auc) ? 0.5 : Math.max(0.01, Math.min(0.99, auc));
+  const k = Math.max(1.2, 4 * validAuc);
   for (let i = 0; i <= 20; i++) {
     const fpr = i / 20;
-    const tpr = Math.min(1, Math.pow(1 - fpr, 1 / k) * 0.98 + (1 - auc) * 0.4 * fpr);
+    const base = Math.max(0, 1 - fpr);
+    const tprVal = Math.min(1, Math.pow(base, 1 / k) * 0.98 + (1 - validAuc) * 0.4 * fpr);
+    const tpr = isNaN(tprVal) ? fpr : Math.max(0, Math.min(1, tprVal));
     pts.push([+fpr.toFixed(3), +tpr.toFixed(3)]);
   }
   return pts;
