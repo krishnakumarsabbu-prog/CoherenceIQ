@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 142 71% 45%;
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 199 89% 48%;
+    --chart-1: 199 89% 48%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 0 72% 51%;
+    --chart-5: 262 83% 58%;
+    --radius: 0.6rem;
+  }
+  .dark {
+    --background: 222 47% 5%;
+    --foreground: 210 40% 96%;
+    --card: 222 44% 8%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 44% 8%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 199 89% 52%;
+    --primary-foreground: 222 47% 5%;
+    --secondary: 217 33% 14%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 217 33% 12%;
+    --muted-foreground: 215 20% 60%;
+    --accent: 217 33% 16%;
+    --accent-foreground: 210 40% 96%;
+    --destructive: 0 72% 56%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 142 71% 48%;
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 54%;
+    --warning-foreground: 210 40% 98%;
+    --border: 217 33% 16%;
+    --input: 217 33% 16%;
+    --ring: 199 89% 52%;
+    --chart-1: 199 89% 52%;
+    --chart-2: 142 71% 48%;
+    --chart-3: 38 92% 54%;
+    --chart-4: 0 72% 56%;
+    --chart-5: 262 83% 62%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  html, body, #root { height: 100%; }
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-xl border border-white/[0.06] bg-card/80 backdrop-blur-xl;
+    background-image: linear-gradient(180deg, hsl(var(--card) / 0.6), hsl(var(--card) / 0.85));
+    box-shadow: 0 1px 0 0 hsl(var(--foreground) / 0.04) inset, 0 8px 24px -12px hsl(222 47% 2% / 0.6);
+  }
+  .glass-card-hover { @apply transition-all duration-200 hover:border-primary/30; }
+  .glass-card-hover:hover { box-shadow: 0 0 0 1px hsl(var(--primary) / 0.15), 0 12px 32px -12px hsl(222 47% 2% / 0.7); }
+  .kpi-card {
+    @apply glass-card glass-card-hover p-4 relative overflow-hidden;
+  }
+  .grid-cell-decision-allow { @apply bg-success/10 text-success; }
+  .grid-cell-decision-challenge { @apply bg-warning/10 text-warning; }
+  .grid-cell-decision-deny { @apply bg-destructive/10 text-destructive; }
+  .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: hsl(var(--muted)); border-radius: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.5); }
+  .gradient-text {
+    @apply bg-gradient-to-r from-sky-400 to-cyan-300 bg-clip-text text-transparent;
+  }
+}
+
+/* AG Grid dark theme integration */
+.ag-theme-coherence.ag-theme-quartz {
+  --ag-background-color: transparent;
+  --ag-foreground-color: hsl(var(--foreground));
+  --ag-header-background-color: hsl(217 33% 10%);
+  --ag-odd-row-background-color: hsl(217 33% 7% / 0.4);
+  --ag-header-foreground-color: hsl(var(--muted-foreground));
+  --ag-border-color: hsl(var(--border));
+  --ag-row-hover-color: hsl(199 89% 52% / 0.08);
+  --ag-selected-row-background-color: hsl(199 89% 52% / 0.14);
+  --ag-range-selection-border-color: hsl(var(--primary));
+  --ag-grid-size: 7px;
+  --ag-list-item-height: 28px;
+  --ag-cell-horizontal-padding: 10px;
+  --ag-borders: solid 1px;
+  --ag-border-radius: 6px;
+  --ag-font-family: Inter, system-ui, sans-serif;
+  --ag-font-size: 12.5px;
+}
+.ag-theme-coherence .ag-header { border-bottom: 1px solid hsl(var(--border)); }
+.ag-theme-coherence .ag-root-wrapper { border: none; background: transparent; }
+.ag-theme-coherence .ag-row { border-left: 2px solid transparent; }
+.ag-theme-coherence .ag-row.ag-row-hover { border-left-color: hsl(var(--primary) / 0.4); }
+.ag-theme-coherence .ag-row.ag-row-selected { border-left-color: hsl(var(--primary)); }
+.ag-theme-coherence .ag-header-cell-label { font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; font-size: 10.5px; }
+.ag-theme-coherence .ag-paging-panel { border-top: 1px solid hsl(var(--border)); background: hsl(var(--muted) / 0.3); }
+
+.react-flow__node { font-family: Inter, system-ui, sans-serif; }
+.react-flow__attribution { display: none; }
+
+/* Monaco editor container */
+.monaco-container .monaco-editor, .monaco-container .monaco-editor .margin { background: transparent !important; }
