@@ -5,12 +5,15 @@ import { ThemeSwitcher } from "./ThemeSwitcher";
 import { UserProfile } from "./UserProfile";
 import { Command, CircleHelp as HelpCircle, Activity, Zap } from "lucide-react";
 import { Tooltip } from "@/components/ui/misc";
+import { CopilotDockToggle } from "@/components/copilot/CopilotPanel";
 
 interface TopNavProps {
   onOpenCommand: () => void;
+  copilotOpen: boolean;
+  onToggleCopilot: () => void;
 }
 
-export function TopNav({ onOpenCommand }: TopNavProps) {
+export function TopNav({ onOpenCommand, copilotOpen, onToggleCopilot }: TopNavProps) {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -61,6 +64,7 @@ export function TopNav({ onOpenCommand }: TopNavProps) {
             <Zap className="h-4 w-4" />
           </button>
         </Tooltip>
+        <CopilotDockToggle open={copilotOpen} onToggle={onToggleCopilot} />
         <Tooltip content="Help & docs">
           <button className="hidden h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground sm:inline-flex">
             <HelpCircle className="h-4 w-4" />

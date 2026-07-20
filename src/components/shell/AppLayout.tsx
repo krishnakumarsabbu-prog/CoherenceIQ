@@ -1,17 +1,22 @@
-import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { TopNav } from "./TopNav";
 import { Sidebar } from "./Sidebar";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { CommandPalette } from "./CommandPalette";
-import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAuth } from "@/providers/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { CopilotPanel, CopilotDockEdge } from "@/components/copilot/CopilotPanel";
+import { generateSessions } from "@/lib/mockData";
+import type { LoginSession } from "@/types";
+
+const SESSIONS = generateSessions(200);
 
 export function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [copilotOpen, setCopilotOpen] = useState(false);
   const { toggle } = useTheme();
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -28,7 +33,7 @@ export function AppLayout() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  useEffect(() => { setCmdOpen(false); }, [location.pathname]);
+  useEffect(() => { setCmdOpen(false); setCopilotOpen(false); }, [location.pathname]);
 
   const handleAction = (id: string) => {
     if (id === "toggle-theme") toggle();
@@ -36,12 +41,19 @@ export function AppLayout() {
     else if (id === "notifications") navigate("/dashboard");
   };
 
+  const sessionParams = useParams<{ id: string }>();
+  const contextSession: LoginSession | undefined = useMemo(() => {
+    if (!sessionParams.id) return undefined;
+    const id = sessionParams.id;
+    return SESSIONS.find((s) => s.sessionId === id) ?? SESSIONS.find((s) => s.decision === "Deny");
+  }, [sessionParams.id]);
+
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-background">
-      <TopNav onOpenCommand={() => setCmdOpen(true)} />
+      <TopNav onOpenCommand={() => setCmdOpen(true)} copilotOpen={copilotOpen} onToggleCopilot={() => setCopilotOpen((o) => !o)} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
-        <main className="flex flex-1 flex-col overflow-hidden">
+        <main className="flex flex-1 flex-col overflow-hidden transition-[padding] duration-300" style={{ paddingRight: copilotOpen ? "min(440px, 100vw)" : undefined }}>
           <div className="flex h-11 shrink-0 items-center justify-between border-b border-border bg-card/30 px-5 backdrop-blur-sm">
             <Breadcrumbs />
             <div className="flex items-center gap-3 text-[10.5px] text-muted-foreground">
@@ -71,6 +83,8 @@ export function AppLayout() {
         </main>
       </div>
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} onAction={handleAction} />
+      {!copilotOpen && <CopilotDockEdge onOpen={() => setCopilotOpen(true)} />}
+      <CopilotPanel open={copilotOpen} onOpenChange={setCopilotOpen} contextSession={contextSession} variant="docked" />
     </div>
   );
 }

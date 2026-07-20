@@ -10,6 +10,9 @@ import { RuleStudioPage } from "@/pages/RuleStudioPage";
 import { GraphIntelligencePage } from "@/pages/GraphIntelligencePage";
 import { TemporalIntelligencePage } from "@/pages/TemporalIntelligencePage";
 import { CoherenceBrainPage } from "@/pages/CoherenceBrainPage";
+import { CopilotPage } from "@/pages/CopilotPage";
+import { ReplayStudioPage } from "@/pages/ReplayStudioPage";
+import { ModelStudioPage } from "@/pages/ModelStudioPage";
 import { NAV_MODULES } from "@/config/navigation";
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -39,9 +42,9 @@ export default function App() {
         <Route path="graph" element={<GraphIntelligencePage />} />
         <Route path="temporal" element={<TemporalIntelligencePage />} />
         <Route path="brain" element={<CoherenceBrainPage />} />
-        <Route path="replay" element={<ModulePlaceholder moduleId="replay-studio" />} />
-        <Route path="model" element={<ModulePlaceholder moduleId="model-studio" />} />
-        <Route path="copilot" element={<ModulePlaceholder moduleId="ai-copilot" />} />
+        <Route path="replay" element={<ReplayStudioPage />} />
+        <Route path="model" element={<ModelStudioPage />} />
+        <Route path="copilot" element={<CopilotPage />} />
         <Route path="admin" element={<RuleStudioPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
