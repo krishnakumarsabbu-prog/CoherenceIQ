@@ -79,9 +79,9 @@ export function DashboardPage() {
             <StackedAreaChart
               time={d.riskTrend.map((r) => r.time)}
               series={[
-                { name: "Allow", data: d.riskTrend.map((r) => r.allow), color: "hsl(142 71% 48%)" },
-                { name: "Challenge", data: d.riskTrend.map((r) => r.challenge), color: "hsl(38 92% 54%)" },
-                { name: "Deny", data: d.riskTrend.map((r) => r.deny), color: "hsl(0 72% 56%)" },
+                { name: "Allow", data: d.riskTrend.map((r) => r.allow), color: "hsl(142, 71%, 48%)" },
+                { name: "Challenge", data: d.riskTrend.map((r) => r.challenge), color: "hsl(38, 92%, 54%)" },
+                { name: "Deny", data: d.riskTrend.map((r) => r.deny), color: "hsl(0, 72%, 56%)" },
               ]}
               height={280}
             />
@@ -113,7 +113,7 @@ export function DashboardPage() {
             <CardDescription>Cohort risk over rolling window</CardDescription>
           </CardHeader>
           <CardContent>
-            <GaugeChart value={d.avgRiskScore} label="Risk Index" height={170} color="hsl(38 92% 54%)" />
+            <GaugeChart value={d.avgRiskScore} label="Risk Index" height={170} color="hsl(38, 92%, 54%)" />
             <div className="mt-2 grid grid-cols-3 gap-2 text-center">
               <div className="rounded-md bg-success/10 py-1.5"><div className="text-sm font-bold text-success">Low</div><div className="text-[10px] text-muted-foreground">0–39</div></div>
               <div className="rounded-md bg-warning/10 py-1.5"><div className="text-sm font-bold text-warning">Med</div><div className="text-[10px] text-muted-foreground">40–77</div></div>
@@ -131,8 +131,8 @@ export function DashboardPage() {
             <TrendLineChart
               time={d.fraudTrend.map((f) => f.time)}
               series={[
-                { name: "Fraud Probability %", data: d.fraudTrend.map((f) => f.probability), color: "hsl(0 72% 56%)" },
-                { name: "Blocked Attempts", data: d.fraudTrend.map((f) => f.blocked), color: "hsl(38 92% 54%)" },
+                { name: "Fraud Probability %", data: d.fraudTrend.map((f) => f.probability), color: "hsl(0, 72%, 56%)" },
+                { name: "Blocked Attempts", data: d.fraudTrend.map((f) => f.blocked), color: "hsl(38, 92%, 54%)" },
               ]}
               height={240}
             />

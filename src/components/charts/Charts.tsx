@@ -17,8 +17,8 @@ export function AreaChart({ data, height = 240 }: { data: AreaData; height?: num
       symbol: "none",
       data: s.data,
       lineStyle: { width: 2 },
-      areaStyle: { opacity: 0.18, color: s.color ?? "hsl(199 89% 52%)" },
-      itemStyle: { color: s.color ?? "hsl(199 89% 52%)" },
+      areaStyle: { opacity: 0.18, color: s.color ?? "hsl(199, 89%, 52%)" },
+      itemStyle: { color: s.color ?? "hsl(199, 89%, 52%)" },
       emphasis: { focus: "series" },
     })),
   };
@@ -39,8 +39,8 @@ export function BarChart({ data, height = 240 }: { data: BarData; height?: numbe
       type: "bar",
       data: s.data,
       barWidth: "46%",
-      itemStyle: { color: s.color ?? "hsl(199 89% 52%)", borderRadius: [4, 4, 0, 0] },
-      emphasis: { itemStyle: { color: s.color ?? "hsl(199 89% 62%)" } },
+      itemStyle: { color: s.color ?? "hsl(199, 89%, 52%)", borderRadius: [4, 4, 0, 0] },
+      emphasis: { itemStyle: { color: s.color ?? "hsl(199, 89%, 62%)" } },
     })),
   };
   return <EChart option={option} style={{ height }} />;
@@ -56,7 +56,7 @@ export function PieChart({ data, height = 240, doughnut = true }: { data: { name
         radius: doughnut ? ["52%", "78%"] : "72%",
         center: ["50%", "46%"],
         avoidLabelOverlap: true,
-        itemStyle: { borderColor: "hsl(222 44% 8%)", borderWidth: 3, borderRadius: 4 },
+        itemStyle: { borderColor: "hsl(222, 44%, 8%)", borderWidth: 3, borderRadius: 4 },
         label: { show: false },
         emphasis: { label: { show: true, fontSize: 13, fontWeight: 600 }, scaleSize: 6 },
         data,
@@ -77,13 +77,13 @@ export function HeatmapChart({ data, height = 240 }: { data: { hour: number; day
     visualMap: {
       min: 0, max: 100, calculable: false, orient: "horizontal", left: "center", bottom: 0,
       itemWidth: 12, itemHeight: 90,
-      inRange: { color: ["hsl(217 33% 14%)", "hsl(199 89% 42%)", "hsl(199 89% 62%)", "hsl(142 71% 55%)"] },
+      inRange: { color: ["hsl(217, 33%, 14%)", "hsl(199, 89%, 42%)", "hsl(199, 89%, 62%)", "hsl(142, 71%, 55%)"] },
       textStyle: { fontSize: 10 },
     },
     series: [
       {
         type: "heatmap", data: data.map((d) => [d.hour, d.day, d.value]),
-        emphasis: { itemStyle: { shadowBlur: 10, shadowColor: "hsl(199 89% 52% / 0.5)" } },
+        emphasis: { itemStyle: { shadowBlur: 10, shadowColor: "rgba(14, 165, 233, 0.5)" } },
         progressive: 1000, animation: false,
         itemStyle: { borderRadius: 2 },
       },
@@ -92,19 +92,19 @@ export function HeatmapChart({ data, height = 240 }: { data: { hour: number; day
   return <EChart option={option} style={{ height }} />;
 }
 
-export function GaugeChart({ value, label, height = 160, color = "hsl(199 89% 52%)" }: { value: number; label: string; height?: number; color?: string }) {
+export function GaugeChart({ value, label, height = 160, color = "hsl(199, 89%, 52%)" }: { value: number; label: string; height?: number; color?: string }) {
   const option: EChartsOption = {
     series: [
       {
         type: "gauge", startAngle: 200, endAngle: -20, min: 0, max: 100,
         radius: "92%", center: ["50%", "60%"],
         progress: { show: true, width: 10, roundCap: true, itemStyle: { color } },
-        axisLine: { lineStyle: { width: 10, color: [[1, "hsl(217 33% 16%)"]] } },
+        axisLine: { lineStyle: { width: 10, color: [[1, "hsl(217, 33%, 16%)"]] } },
         pointer: { show: false },
         axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
         anchor: { show: false },
         detail: { valueAnimation: true, fontSize: 26, fontWeight: 700, offsetCenter: [0, 0], formatter: "{value}", color },
-        title: { offsetCenter: [0, "32%"], fontSize: 11, color: "hsl(215 20% 60%)" },
+        title: { offsetCenter: [0, "32%"], fontSize: 11, color: "hsl(215, 20%, 60%)" },
         data: [{ value, name: label }],
       },
     ],
@@ -132,9 +132,9 @@ export function CountryMapChart({ data, height = 260 }: { data: { code: string; 
         type: "bar", barWidth: 14, barGap: 2,
         data: top.map((t) => ({ value: t.value, name: t.name, risk: t.risk })).reverse(),
         itemStyle: { borderRadius: [0, 6, 6, 0], color: (p: any) =>
-          p.data.risk >= 60 ? "hsl(0 72% 56%)" : p.data.risk >= 40 ? "hsl(38 92% 54%)" : "hsl(142 71% 48%)"
+          p.data.risk >= 60 ? "hsl(0, 72%, 56%)" : p.data.risk >= 40 ? "hsl(38, 92%, 54%)" : "hsl(142, 71%, 48%)"
         },
-        label: { show: true, position: "right", formatter: (p: any) => `${p.value}`, fontSize: 10.5, color: "hsl(215 20% 60%)" },
+        label: { show: true, position: "right", formatter: (p: any) => `${p.value}`, fontSize: 10.5, color: "hsl(215, 20%, 60%)" },
       },
     ],
   };
@@ -158,7 +158,7 @@ export function TrendLineChart({ time, series, height = 220 }: { time: string[];
 }
 
 export function StackedAreaChart({ time, series, height = 260 }: { time: string[]; series: { name: string; data: number[]; color?: string }[]; height?: number }) {
-  const palette = ["hsl(142 71% 48%)", "hsl(38 92% 54%)", "hsl(0 72% 56%)"];
+  const palette = ["hsl(142, 71%, 48%)", "hsl(38, 92%, 54%)", "hsl(0, 72%, 56%)"];
   const option: EChartsOption = {
     legend: { top: 0, right: 0, textStyle: { fontSize: 10.5 } },
     grid: { left: 8, right: 12, top: 36, bottom: 24, containLabel: true },

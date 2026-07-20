@@ -43,14 +43,14 @@ export function EChart({ option, className, style, onEvents }: ChartProps) {
 }
 
 function baseOption(dark: boolean) {
-  const fg = dark ? "hsl(210 40% 96%)" : "hsl(222 47% 11%)";
-  const muted = dark ? "hsl(215 20% 60%)" : "hsl(215 16% 47%)";
-  const grid = dark ? "hsl(217 33% 16%)" : "hsl(214 32% 91%)";
+  const fg = dark ? "hsl(210, 40%, 96%)" : "hsl(222, 47%, 11%)";
+  const muted = dark ? "hsl(215, 20%, 60%)" : "hsl(215, 16%, 47%)";
+  const grid = dark ? "hsl(217, 33%, 16%)" : "hsl(214, 32%, 91%)";
   return {
     textStyle: { color: fg, fontFamily: "Inter, system-ui, sans-serif", fontSize: 11 },
-    color: ["hsl(199 89% 52%)", "hsl(142 71% 48%)", "hsl(38 92% 54%)", "hsl(0 72% 56%)", "hsl(262 83% 62%)"],
+    color: ["hsl(199, 89%, 52%)", "hsl(142, 71%, 48%)", "hsl(38, 92%, 54%)", "hsl(0, 72%, 56%)", "hsl(262, 83%, 62%)"],
     tooltip: {
-      backgroundColor: dark ? "hsl(222 44% 8% / 0.95)" : "hsl(0 0% 100% / 0.95)",
+      backgroundColor: dark ? "rgba(15, 23, 42, 0.95)" : "rgba(255, 255, 255, 0.95)",
       borderColor: grid,
       borderWidth: 1,
       textStyle: { color: fg, fontSize: 11.5 },

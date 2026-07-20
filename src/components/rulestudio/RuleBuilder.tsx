@@ -30,7 +30,7 @@ const ACTION_TONE: Record<ActionKind, string> = {
   "Block": "bg-destructive/15 text-destructive border-destructive/30",
 };
 
-function isGroup(n: TreeNode): n is GroupNode { return "op" in n; }
+function isGroup(n?: TreeNode | null): n is GroupNode { return Boolean(n && typeof n === "object" && "op" in n); }
 
 interface DragState {
   id: string;
@@ -45,7 +45,7 @@ interface BuilderProps {
 
 export function RuleBuilder({ rule, onChange }: BuilderProps) {
   const [drag, setDrag] = useState<DragState | null>(null);
-  const [selected, setSelected] = useState<string | null>(rule.root.id);
+  const [selected, setSelected] = useState<string | null>(rule?.root?.id ?? null);
 
   const updateRoot = (next: GroupNode) => onChange({ ...rule, root: next });
 
@@ -53,7 +53,7 @@ export function RuleBuilder({ rule, onChange }: BuilderProps) {
     const visit = (node: TreeNode): TreeNode | null => {
       if (node.id === nodeId) return mutator(node);
       if (isGroup(node)) {
-        const kids = node.children.map(visit).filter((x): x is TreeNode => x !== null);
+        const kids = (node.children ?? []).map(visit).filter((x): x is TreeNode => x !== null);
         return { ...node, children: kids };
       }
       return node;
@@ -65,7 +65,7 @@ export function RuleBuilder({ rule, onChange }: BuilderProps) {
   const findParent = (id: string, node: TreeNode = rule.root, parent: GroupNode | null = null): GroupNode | null => {
     if (node.id === id) return parent;
     if (isGroup(node)) {
-      for (const c of node.children) {
+      for (const c of (node.children ?? [])) {
         const r = findParent(id, c, node);
         if (r) return r;
       }
@@ -75,25 +75,25 @@ export function RuleBuilder({ rule, onChange }: BuilderProps) {
 
   const addCondition = (parentId: string) => {
     const newCond: ConditionNode = { id: uid("c"), variable: "session.riskScore", op: "greater_than", value: "50", plugin: "Coherence Brain" };
-    updateRoot(mutateNode(null, parentId, (n) => isGroup(n) ? { ...n, children: [...n.children, newCond] } : n));
+    updateRoot(mutateNode(null, parentId, (n) => isGroup(n) ? { ...n, children: [...(n.children ?? []), newCond] } : n));
   };
   const addGroup = (parentId: string, op: LogicalOp = "AND") => {
     const newGroup: GroupNode = { id: uid("g"), op, negated: false, children: [] };
-    updateRoot(mutateNode(null, parentId, (n) => isGroup(n) ? { ...n, children: [...n.children, newGroup] } : n));
+    updateRoot(mutateNode(null, parentId, (n) => isGroup(n) ? { ...n, children: [...(n.children ?? []), newGroup] } : n));
   };
   const removeNode = (id: string) => {
     const parent = findParent(id);
     if (!parent) return;
-    updateRoot(mutateNode(null, parent.id, (n) => isGroup(n) ? { ...n, children: n.children.filter((c) => c.id !== id) } : n));
+    updateRoot(mutateNode(null, parent.id, (n) => isGroup(n) ? { ...n, children: (n.children ?? []).filter((c) => c.id !== id) } : n));
   };
   const duplicateNode = (id: string) => {
-    const clone = (n: TreeNode): TreeNode => isGroup(n) ? { ...n, id: uid("g"), children: n.children.map(clone) } : { ...n, id: uid("c") };
+    const clone = (n: TreeNode): TreeNode => isGroup(n) ? { ...n, id: uid("g"), children: (n.children ?? []).map(clone) } : { ...n, id: uid("c") };
     const parent = findParent(id);
     if (!parent) return;
-    const target = parent.children.find((c) => c.id === id);
+    const target = (parent.children ?? []).find((c) => c.id === id);
     if (!target) return;
     const cp = clone(target);
-    updateRoot(mutateNode(null, parent.id, (n) => isGroup(n) ? { ...n, children: [...n.children, cp] } : n));
+    updateRoot(mutateNode(null, parent.id, (n) => isGroup(n) ? { ...n, children: [...(n.children ?? []), cp] } : n));
   };
   const updateNode = (id: string, patch: Partial<ConditionNode> | Partial<GroupNode>) => {
     updateRoot(mutateNode(null, id, (n) => ({ ...n, ...patch } as TreeNode)));
@@ -102,10 +102,11 @@ export function RuleBuilder({ rule, onChange }: BuilderProps) {
   const moveNode = (id: string, dir: -1 | 1) => {
     const parent = findParent(id);
     if (!parent) return;
-    const idx = parent.children.findIndex((c) => c.id === id);
+    const pKids = parent.children ?? [];
+    const idx = pKids.findIndex((c) => c.id === id);
     const target = idx + dir;
-    if (target < 0 || target >= parent.children.length) return;
-    const kids = [...parent.children];
+    if (target < 0 || target >= pKids.length) return;
+    const kids = [...pKids];
     [kids[idx], kids[target]] = [kids[target], kids[idx]];
     updateRoot(mutateNode(null, parent.id, (n) => isGroup(n) ? { ...n, children: kids } : n));
   };
@@ -113,17 +114,18 @@ export function RuleBuilder({ rule, onChange }: BuilderProps) {
   const reorderInto = (dragId: string, targetParentId: string, targetIndex: number) => {
     const srcParent = findParent(dragId);
     if (!srcParent) return;
-    const node = srcParent.children.find((c) => c.id === dragId);
+    const sKids = srcParent.children ?? [];
+    const node = sKids.find((c) => c.id === dragId);
     if (!node) return;
     if (dragId === targetParentId) return;
     // Prevent dropping a group into itself
     let p: GroupNode | null = findParent(targetParentId);
     while (p) { if (p.id === dragId) return; p = findParent(p.id); }
-    const srcKids = srcParent.children.filter((c) => c.id !== dragId);
+    const srcKids = sKids.filter((c) => c.id !== dragId);
     let root: TreeNode = mutateNode(null, srcParent.id, (n) => isGroup(n) ? { ...n, children: srcKids } : n);
     const tgtParent = findIn(root, targetParentId);
     if (!tgtParent || !isGroup(tgtParent)) return;
-    const newKids = [...tgtParent.children];
+    const newKids = [...(tgtParent.children ?? [])];
     newKids.splice(Math.min(targetIndex, newKids.length), 0, node);
     root = mutateIn(root, targetParentId, (n) => isGroup(n) ? { ...n, children: newKids } : n);
     onChange({ ...rule, root: (root && isGroup(root)) ? root : rule.root });
@@ -222,19 +224,20 @@ export function RuleBuilder({ rule, onChange }: BuilderProps) {
   );
 }
 
-function countNodes(n: TreeNode): number {
-  if (isGroup(n)) return 1 + n.children.reduce((a, c) => a + countNodes(c), 0);
+function countNodes(n?: TreeNode | null): number {
+  if (!n) return 0;
+  if (isGroup(n)) return 1 + (n.children ?? []).reduce((a, c) => a + countNodes(c), 0);
   return 1;
 }
 
 function findIn(root: TreeNode, id: string): TreeNode | null {
   if (root.id === id) return root;
-  if (isGroup(root)) for (const c of root.children) { const r = findIn(c, id); if (r) return r; }
+  if (isGroup(root)) for (const c of (root.children ?? [])) { const r = findIn(c, id); if (r) return r; }
   return null;
 }
 function mutateIn(root: TreeNode, id: string, fn: (n: TreeNode) => TreeNode): TreeNode {
   if (root.id === id) return fn(root);
-  if (isGroup(root)) return { ...root, children: root.children.map((c) => mutateIn(c, id, fn)) };
+  if (isGroup(root)) return { ...root, children: (root.children ?? []).map((c) => mutateIn(c, id, fn)) };
   return root;
 }
 
@@ -263,6 +266,7 @@ function TreeView(props: TreeViewProps) {
 function GroupView({ node, depth, selected, onSelect, drag, setDrag, onReorder, onRemove, onDuplicate, onMove, onAddCondition, onAddGroup, onUpdateNode, rootId }: TreeViewProps & { node: GroupNode }) {
   const isRoot = node.id === rootId;
   const [addMenu, setAddMenu] = useState(false);
+  const children = node.children ?? [];
   return (
     <div className={cn("relative", depth > 0 && "ml-3 border-l border-border/60 pl-3")}>
       {!isRoot && (
@@ -327,15 +331,15 @@ function GroupView({ node, depth, selected, onSelect, drag, setDrag, onReorder, 
             </>
           )}
         </Popover>
-        <span className="ml-auto text-[10px] text-muted-foreground/60">{node.children.length} items</span>
+        <span className="ml-auto text-[10px] text-muted-foreground/60">{children.length} items</span>
       </div>
       <div className="space-y-0.5">
-        {node.children.length === 0 && (
+        {children.length === 0 && (
           <div className="rounded-md border border-dashed border-border/60 px-3 py-2 text-[11.5px] text-muted-foreground/70">
             Empty {node.op} — add a condition or nested group.
           </div>
         )}
-        {node.children.map((child, i) => (
+        {children.map((child, i) => (
           <div key={child.id}>
             <DropZone parentId={node.id} index={i} drag={drag} setDrag={setDrag} onReorder={onReorder} />
             <TreeView
@@ -356,7 +360,7 @@ function GroupView({ node, depth, selected, onSelect, drag, setDrag, onReorder, 
             />
           </div>
         ))}
-        {!isRoot && <DropZone parentId={node.id} index={node.children.length} drag={drag} setDrag={setDrag} onReorder={onReorder} />}
+        {!isRoot && <DropZone parentId={node.id} index={children.length} drag={drag} setDrag={setDrag} onReorder={onReorder} />}
       </div>
     </div>
   );

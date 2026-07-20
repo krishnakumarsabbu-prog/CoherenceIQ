@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Gavel, Puzzle, Settings, Plus, Search, GitBranch, ShieldCheck, Filter, CircleCheck as CheckCircle2, Clock, TriangleAlert as AlertTriangle, Circle as XCircle, Play, Sparkles } from "lucide-react";
+import { Gavel, Puzzle, Settings, Plus, Search, GitBranch, ShieldCheck, Filter, CircleCheck as CheckCircle2, Clock, TriangleAlert as AlertTriangle, Circle as XCircle, Play, Sparkles, PanelRightClose, PanelRightOpen, Code as Code2 } from "lucide-react";
 import { SEED_RULES, type RiskRule, type RuleStatus, uid, type GroupNode, type ConditionNode, type RuleAction, type ActionKind } from "@/lib/ruleStudioData";
 import { cn, relativeTime } from "@/lib/utils";
 import { PageHeader } from "@/components/shell/Breadcrumbs";
@@ -72,11 +72,12 @@ export function RuleStudioPage() {
   const [activeId, setActiveId] = useState<string>(SEED_RULES[0].id);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<RuleStatus | "All">("All");
+  const [editorCollapsed, setEditorCollapsed] = useState(false);
 
-  const active = useMemo(() => rules.find((r) => r.id === activeId) ?? rules[0], [rules, activeId]);
+  const active = useMemo(() => rules.find((r) => r.id === activeId) ?? rules[0] ?? freshRule(), [rules, activeId]);
   const filtered = useMemo(() => rules.filter((r) =>
     (statusFilter === "All" || r.status === statusFilter) &&
-    (r.name.toLowerCase().includes(q.toLowerCase()) || r.id.toLowerCase().includes(q.toLowerCase()) || r.owner.toLowerCase().includes(q.toLowerCase())),
+    ((r.name ?? "").toLowerCase().includes(q.toLowerCase()) || (r.id ?? "").toLowerCase().includes(q.toLowerCase()) || (r.owner ?? "").toLowerCase().includes(q.toLowerCase())),
   ), [rules, q, statusFilter]);
 
   const updateRule = (next: RiskRule) => {
@@ -89,10 +90,32 @@ export function RuleStudioPage() {
     setTab("studio");
   };
   const publishRule = () => {
-    updateRule({ ...active, status: "Published", version: active.version + 1, versions: [{ version: active.version + 1, author: active.owner, date: new Date().toISOString().slice(0, 10), change: "Published to production", status: "Published" }, ...active.versions] });
+    if (!active) return;
+    const versions = active.versions ?? [];
+    updateRule({
+      ...active,
+      status: "Published",
+      version: (active.version ?? 1) + 1,
+      versions: [
+        { version: (active.version ?? 1) + 1, author: active.owner ?? "User", date: new Date().toISOString().slice(0, 10), change: "Published to production", status: "Published" },
+        ...versions,
+      ],
+    });
   };
-  const approveStep = (id: string) => updateRule({ ...active, approvals: active.approvals.map((a) => a.id === id ? { ...a, status: "Approved", date: new Date().toISOString().slice(0, 10) } : a) });
-  const rejectStep = (id: string) => updateRule({ ...active, approvals: active.approvals.map((a) => a.id === id ? { ...a, status: "Rejected", date: new Date().toISOString().slice(0, 10), comment: "Rejected" } : a) });
+  const approveStep = (id: string) => {
+    if (!active) return;
+    updateRule({
+      ...active,
+      approvals: (active.approvals ?? []).map((a) => a.id === id ? { ...a, status: "Approved", date: new Date().toISOString().slice(0, 10) } : a),
+    });
+  };
+  const rejectStep = (id: string) => {
+    if (!active) return;
+    updateRule({
+      ...active,
+      approvals: (active.approvals ?? []).map((a) => a.id === id ? { ...a, status: "Rejected", date: new Date().toISOString().slice(0, 10), comment: "Rejected" } : a),
+    });
+  };
 
   const stats = useMemo(() => ({
     total: rules.length,
@@ -186,18 +209,48 @@ export function RuleStudioPage() {
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm"><Play className="h-3.5 w-3.5" /> Simulate</Button>
                   <Button variant="outline" size="sm"><GitBranch className="h-3.5 w-3.5" /> Version</Button>
+                  <Button
+                    variant={editorCollapsed ? "secondary" : "outline"}
+                    size="sm"
+                    onClick={() => setEditorCollapsed(!editorCollapsed)}
+                    title={editorCollapsed ? "Expand Code & Inspector Panel" : "Collapse Code & Inspector Panel"}
+                    className="gap-1.5 border-primary/30"
+                  >
+                    {editorCollapsed ? <PanelRightOpen className="h-3.5 w-3.5 text-primary" /> : <PanelRightClose className="h-3.5 w-3.5" />}
+                    <span>{editorCollapsed ? "Show Inspector" : "Hide Inspector"}</span>
+                  </Button>
                   <Button size="sm"><Sparkles className="h-3.5 w-3.5" /> Submit</Button>
                 </div>
               </div>
-              <div className="flex-1 overflow-hidden p-4">
-                <ResizablePanels defaultSizes={[52, 48]} minSizes={[30, 30]} storageKey="rule-studio-split">
-                  <div className="h-full overflow-hidden pr-2">
+              <div className="relative flex-1 overflow-hidden p-4">
+                {editorCollapsed ? (
+                  <div className="relative h-full w-full overflow-hidden">
                     <RuleBuilder rule={active} onChange={updateRule} />
+                    <motion.button
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => setEditorCollapsed(false)}
+                      className="group absolute right-3 top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-2.5 rounded-xl border border-primary/40 bg-card/95 p-2 shadow-2xl backdrop-blur-md transition-all hover:border-primary hover:bg-card hover:scale-105"
+                      title="Expand Code & Inspection Panel"
+                    >
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15 text-primary shadow-inner">
+                        <PanelRightOpen className="h-4 w-4" />
+                      </div>
+                      <span className="[writing-mode:vertical-lr] rotate-180 text-[11px] font-bold tracking-wider text-muted-foreground transition-colors group-hover:text-primary">
+                        Code & Inspector
+                      </span>
+                    </motion.button>
                   </div>
-                  <div className="h-full overflow-hidden pl-2">
-                    <RuleEditor rule={active} onPublish={publishRule} onApprove={approveStep} onReject={rejectStep} />
-                  </div>
-                </ResizablePanels>
+                ) : (
+                  <ResizablePanels defaultSizes={[55, 45]} minSizes={[30, 25]} storageKey="rule-studio-split">
+                    <div className="h-full overflow-hidden pr-2">
+                      <RuleBuilder rule={active} onChange={updateRule} />
+                    </div>
+                    <div className="h-full overflow-hidden pl-2">
+                      <RuleEditor rule={active} onPublish={publishRule} onApprove={approveStep} onReject={rejectStep} onCollapse={() => setEditorCollapsed(true)} />
+                    </div>
+                  </ResizablePanels>
+                )}
               </div>
             </div>
           </div>
