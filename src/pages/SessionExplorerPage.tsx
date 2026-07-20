@@ -191,7 +191,7 @@ export function SessionExplorerPage() {
       </div>
 
       {/* Grid */}
-      <div className="ag-theme-coherence ag-theme-quartz glass-card flex-1 overflow-hidden p-0">
+      <div className="ag-theme-coherence ag-theme-quartz glass-card flex-1 min-h-[520px] w-full overflow-hidden p-0">
         <AgGridReact<LoginSession>
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}

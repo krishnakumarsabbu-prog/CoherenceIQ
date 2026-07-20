@@ -16,7 +16,7 @@ export interface NavModule {
 export const NAV_MODULES: NavModule[] = [
   { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, group: "Operate", description: "Executive risk overview & KPIs" },
   { id: "session-explorer", label: "Session Explorer", path: "/sessions", icon: Search, group: "Investigate", description: "Search & filter all login sessions" },
-  { id: "session-investigation", label: "Session Investigation", path: "/sessions/:id", icon: FileSearch, group: "Investigate", description: "Deep-dive a single session", badge: "PRO" },
+  { id: "session-investigation", label: "Session Investigation", path: "/sessions/S-10000", icon: FileSearch, group: "Investigate", description: "Deep-dive a single session", badge: "PRO" },
   { id: "evidence-explorer", label: "Evidence Explorer", path: "/evidence", icon: FolderSearch, group: "Investigate", description: "Forensic evidence vault" },
   { id: "rule-studio", label: "Rule Studio", path: "/rules", icon: Gavel, group: "Govern", description: "Author & test risk rules" },
   { id: "plugin-marketplace", label: "Plugin Marketplace", path: "/plugins", icon: Puzzle, group: "Govern", description: "Install detection plugins" },

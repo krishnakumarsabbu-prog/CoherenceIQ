@@ -194,7 +194,7 @@ export function SessionInvestigationPage() {
       </motion.div>
 
       {/* Three-panel workstation */}
-      <div className="glass-card relative min-h-0 flex-1 overflow-hidden p-0">
+      <div className="glass-card relative flex-1 min-h-[580px] w-full overflow-hidden p-0">
         {/* Panel column headers overlay */}
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex border-b border-border/40 bg-background/60 backdrop-blur-sm">
           <div style={{ width: `${sizes[0]}%` }} className="flex items-center justify-between border-r border-border/40 px-3 py-1">

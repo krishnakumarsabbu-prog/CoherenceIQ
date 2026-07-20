@@ -54,7 +54,7 @@ export function AppLayout() {
               <span className="font-mono">v3.2.1</span>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto scrollbar-thin">
+          <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname.split("/")[1] || "dashboard"}
@@ -62,7 +62,7 @@ export function AppLayout() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="min-h-full"
+                className="flex flex-1 flex-col h-full min-h-0 overflow-auto scrollbar-thin"
               >
                 <Outlet />
               </motion.div>
