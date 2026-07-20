@@ -226,6 +226,5 @@ export function SessionExplorerPage() {
         <span className="font-mono">{formatNumber(stats.total)} records · AG Grid Enterprise</span>
       </div>
     </div>
-  )
   );
 }
