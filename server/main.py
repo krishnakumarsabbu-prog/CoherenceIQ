@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Dict
+from typing import List, Dict, Any
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -83,6 +83,27 @@ def get_feature_graph() -> Dict:
 @app.get("/api/stats")
 def get_stats() -> Dict:
     return store.stats()
+
+
+# New Enterprise Rule Intelligence Endpoints
+@app.get("/api/intelligence/signals")
+def get_signals() -> Dict[str, Any]:
+    return store.signals()
+
+
+@app.get("/api/intelligence/similarity")
+def get_similarity() -> Dict[str, Any]:
+    return store.similarity()
+
+
+@app.get("/api/intelligence/kg")
+def get_kg() -> Dict[str, Any]:
+    return store.kg()
+
+
+@app.get("/api/intelligence/communities")
+def get_communities() -> List[List[str]]:
+    return store.communities()
 
 
 class TextUpload(BaseModel):

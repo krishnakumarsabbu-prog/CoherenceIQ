@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import ReactFlow, { Background, Controls, type Node, type Edge, type NodeTypes, MarkerType } from "reactflow";
+import ReactFlow, { Background, Controls, Handle, Position, type Node, type Edge, type NodeTypes, MarkerType } from "reactflow";
 import "reactflow/dist/style.css";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -29,7 +29,8 @@ interface GraphNodeData {
 
 function RuleNode({ data }: { data: GraphNodeData }) {
   return (
-    <div className="react-flow-node-custom rounded-lg border border-border/60 bg-card/80 px-2.5 py-1.5 text-center shadow-sm backdrop-blur">
+    <div className="react-flow-node-custom relative rounded-lg border border-border/60 bg-card/80 px-2.5 py-1.5 text-center shadow-sm backdrop-blur">
+      <Handle type="source" position={Position.Top} className="!w-1.5 !h-1.5 !bg-muted-foreground/60 border-none" />
       <div className="max-w-[140px] truncate text-[10px] font-semibold text-foreground" title={data.label}>{data.label}</div>
     </div>
   );
@@ -38,7 +39,9 @@ function RuleNode({ data }: { data: GraphNodeData }) {
 function FeatureNode({ data }: { data: GraphNodeData }) {
   const color = data.domain ? DOMAIN_COLORS[data.domain] ?? "#0ea5e9" : "#0ea5e9";
   return (
-    <div className="react-flow-node-custom rounded-xl border-2 px-3 py-2 text-center shadow-md backdrop-blur-md" style={{ borderColor: color, background: `${color}18` }}>
+    <div className="react-flow-node-custom relative rounded-xl border-2 px-3 py-2 text-center shadow-md backdrop-blur-md" style={{ borderColor: color, background: `${color}18` }}>
+      <Handle type="target" position={Position.Bottom} className="!w-1.5 !h-1.5 !bg-muted-foreground/60 border-none" />
+      <Handle type="source" position={Position.Top} className="!w-1.5 !h-1.5 !bg-muted-foreground/60 border-none" />
       <div className="text-[11px] font-bold" style={{ color }}>{data.label}</div>
       <div className="text-[8.5px] uppercase tracking-wide text-muted-foreground">Feature</div>
     </div>
@@ -48,7 +51,8 @@ function FeatureNode({ data }: { data: GraphNodeData }) {
 function DomainNode({ data }: { data: GraphNodeData }) {
   const color = DOMAIN_COLORS[data.label] ?? "#0ea5e9";
   return (
-    <div className="react-flow-node-custom rounded-xl border-2 px-4 py-2.5 text-center shadow-lg backdrop-blur-md" style={{ borderColor: color, background: `${color}22` }}>
+    <div className="react-flow-node-custom relative rounded-xl border-2 px-4 py-2.5 text-center shadow-lg backdrop-blur-md" style={{ borderColor: color, background: `${color}22` }}>
+      <Handle type="target" position={Position.Bottom} className="!w-1.5 !h-1.5 !bg-muted-foreground/60 border-none" />
       <div className="text-[12px] font-bold" style={{ color }}>{data.label}</div>
       <div className="text-[8.5px] uppercase tracking-wide text-muted-foreground">Domain</div>
     </div>
