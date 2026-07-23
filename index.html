@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -10,8 +10,20 @@
     <link rel="stylesheet" href="/ag-grid.min.css" />
     <link rel="stylesheet" href="/ag-theme-quartz.min.css" />
     <title>CoherenceIQ — COHERENCE AI</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("coherence-theme");
+          if (!t) t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          document.documentElement.classList.add(t);
+          document.documentElement.style.colorScheme = t;
+        } catch (e) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
   </head>
-  <body class="dark">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

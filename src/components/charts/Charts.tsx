@@ -1,5 +1,6 @@
 import type { EChartsOption } from "echarts";
 import { EChart } from "./EChart";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface AreaData { time: string[]; series: { name: string; data: number[]; color?: string }[] }
 
@@ -47,6 +48,8 @@ export function BarChart({ data, height = 240 }: { data: BarData; height?: numbe
 }
 
 export function PieChart({ data, height = 240, doughnut = true }: { data: { name: string; value: number }[]; height?: number; doughnut?: boolean }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const option: EChartsOption = {
     legend: { bottom: 0, icon: "circle", textStyle: { fontSize: 11 } },
     tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
@@ -56,7 +59,7 @@ export function PieChart({ data, height = 240, doughnut = true }: { data: { name
         radius: doughnut ? ["52%", "78%"] : "72%",
         center: ["50%", "46%"],
         avoidLabelOverlap: true,
-        itemStyle: { borderColor: "hsl(222, 44%, 8%)", borderWidth: 3, borderRadius: 4 },
+        itemStyle: { borderColor: isDark ? "hsl(222, 44%, 8%)" : "hsl(0, 0%, 100%)", borderWidth: 3, borderRadius: 4 },
         label: { show: false },
         emphasis: { label: { show: true, fontSize: 13, fontWeight: 600 }, scaleSize: 6 },
         data,
@@ -67,6 +70,8 @@ export function PieChart({ data, height = 240, doughnut = true }: { data: { name
 }
 
 export function HeatmapChart({ data, height = 240 }: { data: { hour: number; day: number; value: number }[]; height?: number }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const hours = Array.from({ length: 24 }, (_, i) => `${i}h`);
   const option: EChartsOption = {
@@ -77,7 +82,7 @@ export function HeatmapChart({ data, height = 240 }: { data: { hour: number; day
     visualMap: {
       min: 0, max: 100, calculable: false, orient: "horizontal", left: "center", bottom: 0,
       itemWidth: 12, itemHeight: 90,
-      inRange: { color: ["hsl(217, 33%, 14%)", "hsl(199, 89%, 42%)", "hsl(199, 89%, 62%)", "hsl(142, 71%, 55%)"] },
+      inRange: { color: isDark ? ["hsl(217, 33%, 14%)", "hsl(199, 89%, 42%)", "hsl(199, 89%, 62%)", "hsl(142, 71%, 55%)"] : ["hsl(210, 40%, 94%)", "hsl(199, 89%, 60%)", "hsl(199, 89%, 50%)", "hsl(142, 71%, 45%)"] },
       textStyle: { fontSize: 10 },
     },
     series: [
@@ -93,18 +98,20 @@ export function HeatmapChart({ data, height = 240 }: { data: { hour: number; day
 }
 
 export function GaugeChart({ value, label, height = 160, color = "hsl(199, 89%, 52%)" }: { value: number; label: string; height?: number; color?: string }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const option: EChartsOption = {
     series: [
       {
         type: "gauge", startAngle: 200, endAngle: -20, min: 0, max: 100,
         radius: "92%", center: ["50%", "60%"],
         progress: { show: true, width: 10, roundCap: true, itemStyle: { color } },
-        axisLine: { lineStyle: { width: 10, color: [[1, "hsl(217, 33%, 16%)"]] } },
+        axisLine: { lineStyle: { width: 10, color: [[1, isDark ? "hsl(217, 33%, 16%)" : "hsl(214, 32%, 91%)"]] } },
         pointer: { show: false },
         axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
         anchor: { show: false },
         detail: { valueAnimation: true, fontSize: 26, fontWeight: 700, offsetCenter: [0, 0], formatter: "{value}", color },
-        title: { offsetCenter: [0, "32%"], fontSize: 11, color: "hsl(215, 20%, 60%)" },
+        title: { offsetCenter: [0, "32%"], fontSize: 11, color: isDark ? "hsl(215, 20%, 60%)" : "hsl(215, 16%, 47%)" },
         data: [{ value, name: label }],
       },
     ],
@@ -113,6 +120,8 @@ export function GaugeChart({ value, label, height = 160, color = "hsl(199, 89%, 
 }
 
 export function CountryMapChart({ data, height = 260 }: { data: { code: string; name: string; value: number; risk: number }[]; height?: number }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const top = [...data].sort((a, b) => b.value - a.value).slice(0, 14);
   const option: EChartsOption = {
     tooltip: {
@@ -134,7 +143,7 @@ export function CountryMapChart({ data, height = 260 }: { data: { code: string; 
         itemStyle: { borderRadius: [0, 6, 6, 0], color: (p: any) =>
           p.data.risk >= 60 ? "hsl(0, 72%, 56%)" : p.data.risk >= 40 ? "hsl(38, 92%, 54%)" : "hsl(142, 71%, 48%)"
         },
-        label: { show: true, position: "right", formatter: (p: any) => `${p.value}`, fontSize: 10.5, color: "hsl(215, 20%, 60%)" },
+        label: { show: true, position: "right", formatter: (p: any) => `${p.value}`, fontSize: 10.5, color: isDark ? "hsl(215, 20%, 60%)" : "hsl(215, 16%, 47%)" },
       },
     ],
   };

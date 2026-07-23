@@ -33,6 +33,13 @@
     --chart-4: 0 72% 51%;
     --chart-5: 262 83% 58%;
     --radius: 0.6rem;
+
+    /* AG Grid light theme variables */
+    --ag-header-background-color: 210 40% 94%;
+    --ag-odd-row-background-color: 210 40% 98%;
+    --ag-row-hover-color: 199 89% 96%;
+    --ag-selected-row-background-color: 199 89% 92%;
+    --ag-shadow-color: 222 47% 11%;
   }
   .dark {
     --background: 222 47% 5%;
@@ -63,6 +70,13 @@
     --chart-3: 38 92% 54%;
     --chart-4: 0 72% 56%;
     --chart-5: 262 83% 62%;
+
+    /* AG Grid dark theme variables */
+    --ag-header-background-color: 217 33% 10%;
+    --ag-odd-row-background-color: 217 33% 7%;
+    --ag-row-hover-color: 199 89% 52%;
+    --ag-selected-row-background-color: 199 89% 52%;
+    --ag-shadow-color: 222 47% 2%;
   }
 }
 
@@ -73,16 +87,22 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
   html, body, #root { height: 100%; }
+  /* Smooth theme transitions */
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 @layer components {
   .glass-card {
-    @apply rounded-xl border border-white/[0.06] bg-card/80 backdrop-blur-xl;
+    @apply rounded-xl border border-border/60 bg-card/80 backdrop-blur-xl;
     background-image: linear-gradient(180deg, hsl(var(--card) / 0.6), hsl(var(--card) / 0.85));
-    box-shadow: 0 1px 0 0 hsl(var(--foreground) / 0.04) inset, 0 8px 24px -12px hsl(222 47% 2% / 0.6);
+    box-shadow: 0 1px 0 0 hsl(var(--foreground) / 0.04) inset, 0 8px 24px -12px hsl(var(--ag-shadow-color) / 0.3);
   }
   .glass-card-hover { @apply transition-all duration-200 hover:border-primary/30; }
-  .glass-card-hover:hover { box-shadow: 0 0 0 1px hsl(var(--primary) / 0.15), 0 12px 32px -12px hsl(222 47% 2% / 0.7); }
+  .glass-card-hover:hover { box-shadow: 0 0 0 1px hsl(var(--primary) / 0.15), 0 12px 32px -12px hsl(var(--ag-shadow-color) / 0.35); }
   .kpi-card {
     @apply glass-card glass-card-hover p-4 relative overflow-hidden;
   }
@@ -94,20 +114,20 @@
   .scrollbar-thin::-webkit-scrollbar-thumb { background: hsl(var(--muted)); border-radius: 4px; }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.5); }
   .gradient-text {
-    @apply bg-gradient-to-r from-sky-400 to-cyan-300 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent;
   }
 }
 
-/* AG Grid dark theme integration */
+/* AG Grid theme integration — uses CSS variables that switch with .dark */
 .ag-theme-coherence.ag-theme-quartz {
   --ag-background-color: transparent;
   --ag-foreground-color: hsl(var(--foreground));
-  --ag-header-background-color: hsl(217 33% 10%);
-  --ag-odd-row-background-color: hsl(217 33% 7% / 0.4);
+  --ag-header-background-color: hsl(var(--ag-header-background-color));
+  --ag-odd-row-background-color: hsl(var(--ag-odd-row-background-color) / 0.4);
   --ag-header-foreground-color: hsl(var(--muted-foreground));
   --ag-border-color: hsl(var(--border));
-  --ag-row-hover-color: hsl(199 89% 52% / 0.08);
-  --ag-selected-row-background-color: hsl(199 89% 52% / 0.14);
+  --ag-row-hover-color: hsl(var(--ag-row-hover-color) / 0.08);
+  --ag-selected-row-background-color: hsl(var(--ag-selected-row-background-color) / 0.14);
   --ag-range-selection-border-color: hsl(var(--primary));
   --ag-grid-size: 7px;
   --ag-list-item-height: 28px;
@@ -123,7 +143,7 @@
 .ag-theme-coherence .ag-row.ag-row-hover { border-left-color: hsl(var(--primary) / 0.4); }
 .ag-theme-coherence .ag-row.ag-row-selected { border-left-color: hsl(var(--primary)); }
 .ag-theme-coherence .ag-header-cell-label { font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; font-size: 10.5px; }
-.ag-theme-coherence .ag-paging-panel { border-top: 1px solid hsl(var(--border)); background: hsl(var(--muted) / 0.3); }
+.ag-theme-coherence .ag-paging-panel { border-top: 1px solid hsl(var(--border)); background: hsl(var(--muted) / 0.3); color: hsl(var(--muted-foreground)); }
 
 .react-flow__node { font-family: Inter, system-ui, sans-serif; }
 .react-flow__attribution { display: none; }

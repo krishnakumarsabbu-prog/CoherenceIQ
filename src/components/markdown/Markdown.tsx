@@ -187,14 +187,14 @@ function CodeBlock({ lang, lines }: { lang: string; lines: string[] }) {
     }
   };
   return (
-    <div className="group relative my-2 overflow-hidden rounded-lg border border-border bg-[hsl(222_47%_5%)] text-slate-100 dark:bg-black/40">
-      <div className="flex items-center justify-between border-b border-white/10 px-3 py-1.5">
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-sky-300/80">{lang}</span>
+    <div className="group relative my-2 overflow-hidden rounded-lg border border-border bg-muted/40 dark:bg-black/40">
+      <div className="flex items-center justify-between border-b border-border/60 px-3 py-1.5">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-primary/80">{lang}</span>
         <button
           onClick={copy}
-          className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-100"
+          className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
-          {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+          {copied ? <Check className="h-3 w-3 text-success" /> : <Copy className="h-3 w-3" />}
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
@@ -225,86 +225,86 @@ function SyntaxLine({ lang, line }: { lang: string; line: string }) {
   if (lang === "json") return <JsonLine line={line} />;
   if (lang === "yaml") return <YamlLine line={line} />;
   if (lang === "dsl") return <DslLine line={line} />;
-  return <span className="text-slate-200">{line || " "}</span>;
+  return <span className="text-foreground/90">{line || " "}</span>;
 }
 
 function classifyToken(word: string, lang: string): string {
   const kw = KEYWORDS[lang] ?? [];
-  if (kw.includes(word.toLowerCase())) return "text-fuchsia-400";
-  if (/^-?\d+(\.\d+)?$/.test(word)) return "text-amber-400";
-  if (/^(true|false|null)$/i.test(word)) return "text-fuchsia-400";
-  return "text-slate-200";
+  if (kw.includes(word.toLowerCase())) return "text-fuchsia-600 dark:text-fuchsia-400";
+  if (/^-?\d+(\.\d+)?$/.test(word)) return "text-amber-600 dark:text-amber-400";
+  if (/^(true|false|null)$/i.test(word)) return "text-fuchsia-600 dark:text-fuchsia-400";
+  return "text-foreground/90";
 }
 
 function JsonLine({ line }: { line: string }) {
   const m = line.match(/^(\s*)(.*?)(,)?$/);
-  if (!m) return <span className="text-slate-200">{line}</span>;
+  if (!m) return <span className="text-foreground/90">{line}</span>;
   const [, indent, body, comma] = m;
   const kv = body.match(/^"([^"]+)"\s*:\s*(.*)$/);
   if (kv) {
     const [, key, val] = kv;
     return (
       <span>
-        <span className="text-slate-500">{indent}</span>
-        <span className="text-sky-300">"{key}"</span>
-        <span className="text-slate-400">:</span>
+        <span className="text-muted-foreground/40">{indent}</span>
+        <span className="text-sky-600 dark:text-sky-300">"{key}"</span>
+        <span className="text-muted-foreground">:</span>
         <span className="ml-1">
           <JsonValue value={val} />
         </span>
-        {comma && <span className="text-slate-400">,</span>}
+        {comma && <span className="text-muted-foreground">,</span>}
       </span>
     );
   }
   return (
     <span>
-      <span className="text-slate-500">{indent}</span>
+      <span className="text-muted-foreground/40">{indent}</span>
       <JsonValue value={body} />
-      {comma && <span className="text-slate-400">,</span>}
+      {comma && <span className="text-muted-foreground">,</span>}
     </span>
   );
 }
 
 function JsonValue({ value }: { value: string }) {
   const v = value.trim();
-  if (/^".*"$/.test(v)) return <span className="text-emerald-300">{v}</span>;
-  if (/^(true|false|null)$/i.test(v)) return <span className="text-fuchsia-400">{v}</span>;
-  if (/^-?\d+(\.\d+)?$/.test(v)) return <span className="text-amber-400">{v}</span>;
-  if (v === "{" || v === "}" || v === "[" || v === "]") return <span className="text-slate-400">{v}</span>;
-  return <span className="text-slate-200">{v}</span>;
+  if (/^".*"$/.test(v)) return <span className="text-emerald-600 dark:text-emerald-300">{v}</span>;
+  if (/^(true|false|null)$/i.test(v)) return <span className="text-fuchsia-600 dark:text-fuchsia-400">{v}</span>;
+  if (/^-?\d+(\.\d+)?$/.test(v)) return <span className="text-amber-600 dark:text-amber-400">{v}</span>;
+  if (v === "{" || v === "}" || v === "[" || v === "]") return <span className="text-muted-foreground">{v}</span>;
+  return <span className="text-foreground/90">{v}</span>;
 }
 
 function YamlLine({ line }: { line: string }) {
   const m = line.match(/^(\s*)([A-Za-z0-9_-]+)(:)(.*)$/);
   if (!m) {
-    if (line.trim().startsWith("#")) return <span className="text-slate-500 italic">{line}</span>;
-    return <span className="text-slate-200">{line}</span>;
+    if (line.trim().startsWith("#")) return <span className="text-muted-foreground italic">{line}</span>;
+    return <span className="text-foreground/90">{line}</span>;
   }
   const [, indent, key, colon, rest] = m;
   const val = rest.trim();
   return (
     <span>
-      <span className="text-slate-500">{indent}</span>
-      <span className="text-sky-300">{key}</span>
-      <span className="text-slate-400">{colon}</span>
-      {val && <span className="ml-1 text-emerald-300">{val}</span>}
+      <span className="text-muted-foreground/40">{indent}</span>
+      <span className="text-sky-600 dark:text-sky-300">{key}</span>
+      <span className="text-muted-foreground">{colon}</span>
+      {val && <span className="ml-1 text-emerald-600 dark:text-emerald-300">{val}</span>}
     </span>
   );
 }
 
 function DslLine({ line }: { line: string }) {
   const trimmed = line.trim();
-  if (trimmed.startsWith("//") || trimmed.startsWith("#")) return <span className="text-slate-500 italic">{line}</span>;
+  if (trimmed.startsWith("//") || trimmed.startsWith("#")) return <span className="text-muted-foreground italic">{line}</span>;
   const indent = line.slice(0, line.length - trimmed.length);
   const words = trimmed.split(/(\s+)/);
   return (
     <span>
-      <span className="text-slate-500">{indent}</span>
+      <span className="text-muted-foreground/40">{indent}</span>
       {words.map((w, idx) => {
         if (/^\s+$/.test(w)) return <span key={idx}>{w}</span>;
-        if (/[=<>!]/.test(w)) return <span key={idx} className="text-sky-400">{w}</span>;
-        if (KEYWORDS.dsl.includes(w.toLowerCase())) return <span key={idx} className="text-fuchsia-400 font-semibold">{w}</span>;
-        if (/^-?\d+(\.\d+)?$/.test(w)) return <span key={idx} className="text-amber-400">{w}</span>;
-        if (/^[A-Z][A-Za-z0-9-]*$/.test(w)) return <span key={idx} className="text-emerald-300">{w}</span>;
+        if (/[=<>!]/.test(w)) return <span key={idx} className="text-sky-600 dark:text-sky-400">{w}</span>;
+        if (KEYWORDS.dsl.includes(w.toLowerCase())) return <span key={idx} className="text-fuchsia-600 dark:text-fuchsia-400 font-semibold">{w}</span>;
+        if (/^-?\d+(\.\d+)?$/.test(w)) return <span key={idx} className="text-amber-600 dark:text-amber-400">{w}</span>;
+        if (/^[A-Z][A-Za-z0-9-]*$/.test(w)) return <span key={idx} className="text-emerald-600 dark:text-emerald-300">{w}</span>;
         return <span key={idx} className={classifyToken(w, "dsl")}>{w}</span>;
       })}
     </span>

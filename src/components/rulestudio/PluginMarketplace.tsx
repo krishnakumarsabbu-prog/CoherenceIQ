@@ -214,7 +214,7 @@ function PluginDetailContent({ plugin, onToggle }: { plugin: Plugin; onToggle: (
           </div>
         )}
         {tab === "logs" && (
-          <div className="max-h-80 overflow-auto rounded-lg border border-border bg-[hsl(222_47%_7%)] p-3 font-mono text-[11.5px]">
+          <div className="max-h-80 overflow-auto rounded-lg border border-border bg-muted/30 p-3 font-mono text-[11.5px] dark:bg-black/30">
             {logs.map((l, i) => (
               <div key={i} className="flex gap-2 border-b border-border/40 py-1.5 last:border-0">
                 <span className="text-muted-foreground/60">{l.ts}</span>

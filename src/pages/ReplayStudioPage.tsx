@@ -113,7 +113,7 @@ export function ReplayStudioPage() {
               value={jsonText}
               onChange={(e) => setJsonText(e.target.value)}
               spellCheck={false}
-              className="scrollbar-thin min-h-[200px] flex-1 resize-none bg-[hsl(222_47%_5%)] p-3 font-mono text-[11.5px] leading-relaxed text-slate-200 outline-none dark:bg-black/40"
+              className="scrollbar-thin min-h-[200px] flex-1 resize-none bg-muted/30 p-3 font-mono text-[11.5px] leading-relaxed text-foreground outline-none dark:bg-black/30"
             />
             <div className="shrink-0 border-t border-border px-4 py-2.5">
               {parseError ? (

@@ -83,7 +83,7 @@ export function CodeEditor({ value, onChange, language = "json", readOnly = fals
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg border bg-[hsl(222_47%_7%)] font-mono text-[12.5px] leading-[1.55]",
+        "relative overflow-hidden rounded-lg border bg-muted/30 font-mono text-[12.5px] leading-[1.55] dark:bg-black/30",
         focused ? "border-primary/60 ring-1 ring-primary/30" : "border-border",
         className,
       )}
@@ -91,7 +91,7 @@ export function CodeEditor({ value, onChange, language = "json", readOnly = fals
     >
       <div className="absolute inset-0 flex">
         {/* gutter */}
-        <div className="select-none border-r border-border/60 bg-[hsl(222_47%_5%)] px-2 py-3 text-right text-[11px] text-muted-foreground/60" style={{ width: 48, minWidth: 48 }}>
+        <div className="select-none border-r border-border/60 bg-muted/40 px-2 py-3 text-right text-[11px] text-muted-foreground/60 dark:bg-black/30" style={{ width: 48, minWidth: 48 }}>
           {Array.from({ length: lineCount }, (_, i) => (
             <div key={i} className="tabular-nums">{i + 1}</div>
           ))}
@@ -135,14 +135,14 @@ export function CodeEditor({ value, onChange, language = "json", readOnly = fals
 }
 
 const TOKEN_CLASSES: Record<string, string> = {
-  "json-key": "text-sky-300",
-  "json-string": "text-emerald-300",
-  "json-number": "text-amber-300",
+  "json-key": "text-sky-600 dark:text-sky-300",
+  "json-string": "text-emerald-600 dark:text-emerald-300",
+  "json-number": "text-amber-600 dark:text-amber-300",
   "json-punct": "text-muted-foreground",
-  "json-bool": "text-fuchsia-300",
-  "expr-var": "text-sky-300",
-  "expr-string": "text-emerald-300",
-  "expr-num": "text-amber-300",
-  "expr-op": "text-rose-300",
-  "expr-keyword": "text-fuchsia-300",
+  "json-bool": "text-fuchsia-600 dark:text-fuchsia-300",
+  "expr-var": "text-sky-600 dark:text-sky-300",
+  "expr-string": "text-emerald-600 dark:text-emerald-300",
+  "expr-num": "text-amber-600 dark:text-amber-300",
+  "expr-op": "text-rose-600 dark:text-rose-300",
+  "expr-keyword": "text-fuchsia-600 dark:text-fuchsia-300",
 };

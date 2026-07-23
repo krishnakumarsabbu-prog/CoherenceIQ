@@ -7,6 +7,7 @@ import "reactflow/dist/style.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Smartphone, Globe, Cookie, Phone, Mail, Chrome as Home, Network, Server, MapPin, Building2, Wallet, ArrowLeftRight, X, Share2, ShieldAlert, Filter, Sparkles, Activity } from "lucide-react";
 import { generateSessions } from "@/lib/mockData";
+import { useTheme } from "@/providers/ThemeProvider";
 import { buildGraph, buildProfile, type GraphNode, type EntityKind, type GraphData, type EntityProfile } from "@/lib/graphIntelligenceData";
 import { PageHeader } from "@/components/shell/Breadcrumbs";
 import { Button } from "@/components/ui/button";
@@ -95,6 +96,14 @@ const nodeTypes: NodeTypes = { entity: EntityNode };
 
 export function GraphIntelligencePage() {
   const graph = useMemo(() => buildGraph(SESSION), []);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const edgeMuted = isDark ? "rgba(148,163,184,0.45)" : "rgba(100,116,139,0.5)";
+  const edgeMutedFaint = isDark ? "rgba(148,163,184,0.15)" : "rgba(100,116,139,0.2)";
+  const edgeMarker = isDark ? "rgba(148,163,184,0.6)" : "rgba(100,116,139,0.7)";
+  const labelFill = isDark ? "rgba(148,163,184,0.85)" : "rgba(71,85,105,0.9)";
+  const labelBg = isDark ? "rgba(15,23,42,0.6)" : "rgba(255,255,255,0.85)";
+  const bgDot = isDark ? "rgba(148,163,184,0.12)" : "rgba(100,116,139,0.16)";
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [filter, setFilter] = useState<EntityKind | "all">("all");
@@ -115,14 +124,14 @@ export function GraphIntelligencePage() {
       label: e.label,
       animated: e.flagged,
       style: {
-        stroke: e.flagged ? "#ef4444" : "rgba(148,163,184,0.45)",
+        stroke: e.flagged ? "#ef4444" : edgeMuted,
         strokeWidth: 1.5 + e.strength * 1.5,
         strokeDasharray: e.flagged ? "5 3" : undefined,
       },
-      markerEnd: { type: MarkerType.ArrowClosed, color: e.flagged ? "#ef4444" : "rgba(148,163,184,0.6)" },
-      labelStyle: { fill: "rgba(148,163,184,0.85)", fontSize: 9, fontWeight: 600 },
-      labelBgStyle: { fill: "rgba(15,23,42,0.6)" },
-    })), [graph.edges]);
+      markerEnd: { type: MarkerType.ArrowClosed, color: e.flagged ? "#ef4444" : edgeMarker },
+      labelStyle: { fill: labelFill, fontSize: 9, fontWeight: 600 },
+      labelBgStyle: { fill: labelBg },
+    })), [graph.edges, edgeMuted, edgeMarker, labelFill, labelBg]);
 
   const [rfNodes, setRfNodes, onNodesChange] = useNodesState(initialNodes);
   const [rfEdges, setRfEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -141,9 +150,9 @@ export function GraphIntelligencePage() {
     if (!cluster) return;
     setRfEdges(es => es.map(e => {
       const inCluster = cluster.nodeIds.includes(e.source) && cluster.nodeIds.includes(e.target);
-      return { ...e, style: { ...e.style, stroke: inCluster ? "#0ea5e9" : "rgba(148,163,184,0.15)", strokeWidth: inCluster ? 2.5 : 1 } };
+      return { ...e, style: { ...e.style, stroke: inCluster ? "#0ea5e9" : edgeMutedFaint, strokeWidth: inCluster ? 2.5 : 1 } };
     }));
-  }, [hoveredCluster, graph.clusters, setRfEdges]);
+  }, [hoveredCluster, graph.clusters, setRfEdges, edgeMutedFaint]);
 
   const profile = useMemo<EntityProfile | null>(() => {
     if (!selectedId) return null;
@@ -229,7 +238,7 @@ export function GraphIntelligencePage() {
             defaultEdgeOptions={{ type: "smoothstep" }}
             className="h-full w-full"
           >
-            <Background gap={24} size={1} color="rgba(148,163,184,0.12)" />
+            <Background gap={24} size={1} color={bgDot} />
             <Controls showInteractive={false} className="!bg-background/80 !border-border !backdrop-blur" />
           </ReactFlow>
         </Card>

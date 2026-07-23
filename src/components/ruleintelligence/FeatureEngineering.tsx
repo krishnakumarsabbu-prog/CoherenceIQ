@@ -7,6 +7,7 @@ import { Boxes, Workflow, Brain, Cpu, GitBranch, Filter } from "lucide-react";
 import { ruleIntelligenceApi, type EngineeredFeatureRecord, type DependencyGraph } from "@/lib/ruleIntelligenceData";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const DOMAIN_COLORS: Record<string, string> = {
   "Device Intelligence": "#0ea5e9",
@@ -58,10 +59,15 @@ const nodeTypes: NodeTypes = { rule: RuleNode, feature: FeatureNode, domain: Dom
 
 export function FeatureEngineering() {
   const [view, setView] = useState<"table" | "graph">("table");
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgDot = isDark ? "rgba(148,163,184,0.12)" : "rgba(100,116,139,0.16)";
+  const edgeMuted = isDark ? "rgba(148,163,184,0.4)" : "rgba(100,116,139,0.45)";
+  const edgeMarker = isDark ? "rgba(148,163,184,0.5)" : "rgba(100,116,139,0.6)";
   const { data: features = [] } = useQuery({ queryKey: ["ri-features"], queryFn: ruleIntelligenceApi.getFeatures });
   const { data: graph } = useQuery({ queryKey: ["ri-feature-graph"], queryFn: ruleIntelligenceApi.getFeatureGraph });
 
-  const { nodes, edges } = useMemo(() => buildLayout(graph), [graph]);
+  const { nodes, edges } = useMemo(() => buildLayout(graph, edgeMuted, edgeMarker), [graph, edgeMuted, edgeMarker]);
 
   return (
     <div className="flex h-full flex-col">
@@ -84,7 +90,7 @@ export function FeatureEngineering() {
       ) : (
         <div className="ag-theme-coherence glass-card relative flex-1 min-h-[500px] overflow-hidden p-0">
           <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView fitViewOptions={{ padding: 0.15 }} proOptions={{ hideAttribution: true }} defaultEdgeOptions={{ type: "smoothstep" }} className="h-full w-full">
-            <Background gap={24} size={1} color="rgba(148,163,184,0.12)" />
+            <Background gap={24} size={1} color={bgDot} />
             <Controls showInteractive={false} className="!bg-background/80 !border-border !backdrop-blur" />
           </ReactFlow>
           <div className="absolute left-3 top-3 z-10 rounded-md bg-background/60 px-2 py-1 text-[9px] text-muted-foreground backdrop-blur-sm">
@@ -151,7 +157,7 @@ function FeatureTable({ features }: { features: EngineeredFeatureRecord[] }) {
   );
 }
 
-function buildLayout(graph: DependencyGraph | undefined): { nodes: Node[]; edges: Edge[] } {
+function buildLayout(graph: DependencyGraph | undefined, edgeMuted: string, edgeMarker: string): { nodes: Node[]; edges: Edge[] } {
   if (!graph) return { nodes: [], edges: [] };
 
   const domains = graph.nodes.filter((n) => n.type === "domain");
@@ -194,8 +200,8 @@ function buildLayout(graph: DependencyGraph | undefined): { nodes: Node[]; edges
     source: e.source,
     target: e.target,
     animated: e.kind === "rule-feature",
-    style: { stroke: e.kind === "rule-feature" ? "rgba(148,163,184,0.4)" : "rgba(14,165,233,0.6)", strokeWidth: 1.2 },
-    markerEnd: { type: MarkerType.ArrowClosed, color: e.kind === "rule-feature" ? "rgba(148,163,184,0.5)" : "rgba(14,165,233,0.6)" },
+    style: { stroke: e.kind === "rule-feature" ? edgeMuted : "rgba(14,165,233,0.6)", strokeWidth: 1.2 },
+    markerEnd: { type: MarkerType.ArrowClosed, color: e.kind === "rule-feature" ? edgeMarker : "rgba(14,165,233,0.6)" },
   }));
 
   return { nodes, edges };

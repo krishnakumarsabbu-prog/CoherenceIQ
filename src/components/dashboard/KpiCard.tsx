@@ -16,10 +16,10 @@ interface KpiCardProps {
 }
 
 const ACCENT: Record<string, string> = {
-  primary: "from-sky-500/15 to-transparent text-sky-400",
-  success: "from-emerald-500/15 to-transparent text-emerald-400",
-  warning: "from-amber-500/15 to-transparent text-amber-400",
-  destructive: "from-rose-500/15 to-transparent text-rose-400",
+  primary: "from-sky-500/15 to-transparent text-sky-600 dark:text-sky-400",
+  success: "from-emerald-500/15 to-transparent text-emerald-600 dark:text-emerald-400",
+  warning: "from-amber-500/15 to-transparent text-amber-600 dark:text-amber-400",
+  destructive: "from-rose-500/15 to-transparent text-rose-600 dark:text-rose-400",
 };
 
 export function KpiCard({ label, value, delta, deltaSuffix = "%", icon: Icon, accent = "primary", spark, index = 0 }: KpiCardProps) {
