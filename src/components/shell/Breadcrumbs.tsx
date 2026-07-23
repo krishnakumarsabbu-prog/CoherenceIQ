@@ -7,6 +7,7 @@ const LABELS: Record<string, string> = {
   dashboard: "Dashboard",
   sessions: "Session Explorer",
   evidence: "Evidence Explorer",
+  "rule-intelligence": "Rule Intelligence",
   rules: "Rule Studio",
   plugins: "Plugin Marketplace",
   graph: "Graph Intelligence",

@@ -6,6 +6,7 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { SessionExplorerPage } from "@/pages/SessionExplorerPage";
 import { SessionInvestigationPage } from "@/pages/SessionInvestigationPage";
 import { ModulePlaceholder } from "@/pages/ModulePlaceholder";
+import { RuleIntelligencePage } from "@/pages/RuleIntelligencePage";
 import { RuleStudioPage } from "@/pages/RuleStudioPage";
 import { GraphIntelligencePage } from "@/pages/GraphIntelligencePage";
 import { TemporalIntelligencePage } from "@/pages/TemporalIntelligencePage";
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="sessions" element={<SessionExplorerPage />} />
         <Route path="sessions/:id" element={<SessionInvestigationPage />} />
         <Route path="evidence" element={<ModulePlaceholder moduleId="evidence-explorer" />} />
+        <Route path="rule-intelligence" element={<RuleIntelligencePage />} />
         <Route path="rules" element={<RuleStudioPage />} />
         <Route path="plugins" element={<RuleStudioPage />} />
         <Route path="graph" element={<GraphIntelligencePage />} />

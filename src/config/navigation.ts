@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Search, FileSearch, FolderSearch, Gavel, Puzzle, Share2,
+  LayoutDashboard, Search, FileSearch, FolderSearch, Layers3, Gavel, Puzzle, Share2,
   Clock, Brain, History, Cpu, Sparkles, Settings, type LucideIcon,
 } from "lucide-react";
 
@@ -18,6 +18,7 @@ export const NAV_MODULES: NavModule[] = [
   { id: "session-explorer", label: "Session Explorer", path: "/sessions", icon: Search, group: "Investigate", description: "Search & filter all login sessions" },
   { id: "session-investigation", label: "Session Investigation", path: "/sessions/S-10000", icon: FileSearch, group: "Investigate", description: "Deep-dive a single session", badge: "PRO" },
   { id: "evidence-explorer", label: "Evidence Explorer", path: "/evidence", icon: FolderSearch, group: "Investigate", description: "Forensic evidence vault" },
+  { id: "rule-intelligence", label: "Rule Intelligence", path: "/rule-intelligence", icon: Layers3, group: "Govern", description: "Parse, cluster, and engineer rule features" },
   { id: "rule-studio", label: "Rule Studio", path: "/rules", icon: Gavel, group: "Govern", description: "Author & test risk rules" },
   { id: "plugin-marketplace", label: "Plugin Marketplace", path: "/plugins", icon: Puzzle, group: "Govern", description: "Install detection plugins" },
   { id: "graph-intelligence", label: "Graph Intelligence", path: "/graph", icon: Share2, group: "Intelligence", description: "Entity relationship graph" },
