@@ -20,7 +20,8 @@ class SimilarityEngine:
         ]
 
     def tokenize(self, text: str) -> List[str]:
-        return sorted(list(set(re.findall(r'\b[a-z]{3,}\b', text.lower()))))
+        # Min 2 chars so domain-critical terms like 'ip', 'id', 'km', 'asn' are captured
+        return sorted(list(set(re.findall(r'\b[a-z]{2,}\b', text.lower()))))
 
     def compute_jaccard(self, set_a: Set[str], set_b: Set[str]) -> float:
         union_size = len(set_a.union(set_b))

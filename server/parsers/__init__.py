@@ -31,36 +31,40 @@ class MarkdownParser(BaseParser):
         metadata_engine = MetadataExtractionEngine()
         threshold_engine = ThresholdExtractionEngine()
         intent_engine = IntentDetectionEngine()
-        
+        entity_engine = EntityExtractionEngine()
+
         raw_rules = parser_engine.parse_content(filename, content)
         parsed_rules: List[Rule] = []
-        
+
         for i, r in enumerate(raw_rules):
             rule_name = r["name"]
             description = r["description"] or rule_name
             param_count = r["param_count"] or len(r["parameters"])
             parameters = r["parameters"]
-            
+
             keywords = metadata_engine.extract_keywords(rule_name, description)
-            # Thresholds and time windows
             th_data = threshold_engine.extract(description)
             thresholds = th_data["thresholds"]
             time_windows = th_data["time_windows"]
-            
-            # Intents mapping to decision words
+
             intents = intent_engine.detect(description)
-            decision_words = intents
-            
-            # Risk Level
+            decision_words = sorted(list(set(intents)))
+
             risk_level = metadata_engine.infer_risk(rule_name, description, intents)
-            
-            # Rule ID
+
+            # Entity extraction — user/device/network/transaction identifiers + systems
+            entity_data = entity_engine.extract(f"{rule_name} {description}", parameters)
+            entity_keywords = [
+                item
+                for sublist in entity_data["entities"].values()
+                for item in sublist
+            ]
+            # Merge entity keywords into the keyword set for richer classification signal
+            keywords = sorted(list(set(keywords + [k.lower() for k in entity_keywords])))
+
             alnum = re.sub(r"[^A-Za-z0-9]+", "_", rule_name).strip("_").upper()
-            if alnum:
-                rule_id = f"R-{alnum[:24]}"
-            else:
-                rule_id = f"R-FILE-{i:04d}"
-                
+            rule_id = f"R-{alnum[:24]}" if alnum else f"R-FILE-{i:04d}"
+
             parsed_rules.append(Rule(
                 rule_id=rule_id,
                 rule_name=rule_name,
@@ -75,7 +79,7 @@ class MarkdownParser(BaseParser):
                 status="Published",
                 source_file=filename,
             ))
-            
+
         return parsed_rules
 
 

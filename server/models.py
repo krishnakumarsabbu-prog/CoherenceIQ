@@ -69,10 +69,12 @@ class EngineeredFeature:
     feature_name: str
     domain: str
     derived_rules: List[str]
-    derived_parameters: List[str]
+    derived_parameters: List[str]       # Observed params from actual matched rules
+    blueprint_parameters: List[str]     # Static blueprint-defined theoretical params
     weight: float
     description: str
     used_by: List[str]
+    is_active: bool = True              # False when no rules map to this feature
 
     def to_dict(self) -> Dict:
         return {
@@ -80,7 +82,9 @@ class EngineeredFeature:
             "domain": self.domain,
             "derived_rules": self.derived_rules,
             "derived_parameters": self.derived_parameters,
+            "blueprint_parameters": self.blueprint_parameters,
             "weight": round(self.weight, 3),
             "description": self.description,
             "used_by": self.used_by,
+            "is_active": self.is_active,
         }

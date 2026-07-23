@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, Dict, Optional, Any
 from models import Rule, EngineeredFeature
 from parsers import default_registry
-from clustering import classify_rule, build_clusters, cluster_hierarchy
+from clustering import batch_classify_rules, build_clusters, cluster_hierarchy
 from features import engineer_features, feature_dependency_graph
 
 from intelligence.features import SignalGenerationEngine
@@ -38,8 +38,8 @@ class RuleStore:
         return len(new_rules)
 
     def _reclassify(self) -> None:
-        for r in self._rules:
-            classify_rule(r)
+        """Batch-classifies all rules in one shot — single engine, single TF-IDF matrix."""
+        batch_classify_rules(self._rules)
 
     def all_rules(self) -> List[Rule]:
         return list(self._rules)
@@ -60,36 +60,38 @@ class RuleStore:
         return engineer_features(self._rules)
 
     def dependency_graph(self) -> Dict:
-        return feature_dependency_graph(self._rules, self.features())
+        # Cache features() so it is computed once, not twice
+        feats = self.features()
+        return feature_dependency_graph(self._rules, feats)
 
     def signals(self) -> Dict[str, Any]:
         engine = SignalGenerationEngine()
         return engine.generate_signals(self._rules)
 
-    def similarity(self) -> Dict[str, Any]:
+    def similarity(self, limit: int = 150) -> Dict[str, Any]:
+        """Pairwise similarity — O(N²). Guarded at `limit` rules to prevent timeout."""
+        rules = self._rules[:limit]
         engine = SimilarityEngine()
-        docs = [f"{r.rule_name} {r.description} {' '.join(r.parameters)}" for r in self._rules]
+        docs = [f"{r.rule_name} {r.description} {' '.join(r.parameters)}" for r in rules]
         cosine_matrix = engine.compute_tfidf_and_cosine(docs)
-        
-        pairwise = []
+
         signatures = {}
-        for r in self._rules:
+        for r in rules:
             tokens = set(engine.tokenize(f"{r.rule_name} {r.description} {' '.join(r.parameters)}"))
             signatures[r.rule_id] = engine.compute_minhash_signature(tokens)
-            
+
         lsh_candidates = engine.compute_lsh_candidates(signatures)
         lsh_cand_set = {tuple(sorted(pair)) for pair in lsh_candidates}
-        
-        for i, r1 in enumerate(self._rules):
-            for j, r2 in enumerate(self._rules):
+
+        pairwise = []
+        for i, r1 in enumerate(rules):
+            for j, r2 in enumerate(rules):
                 if i < j:
                     set1 = set(engine.tokenize(f"{r1.rule_name} {r1.description} {' '.join(r1.parameters)}"))
                     set2 = set(engine.tokenize(f"{r2.rule_name} {r2.description} {' '.join(r2.parameters)}"))
                     jaccard = engine.compute_jaccard(set1, set2)
                     cos = float(cosine_matrix[i, j])
-                    
-                    is_lsh_candidate = tuple(sorted([r1.rule_id, r2.rule_id])) in lsh_cand_set
-                    
+                    is_lsh = tuple(sorted([r1.rule_id, r2.rule_id])) in lsh_cand_set
                     pairwise.append({
                         "rule_id_1": r1.rule_id,
                         "rule_name_1": r1.rule_name,
@@ -97,11 +99,13 @@ class RuleStore:
                         "rule_name_2": r2.rule_name,
                         "cosine_similarity": round(cos, 3),
                         "jaccard_similarity": round(jaccard, 3),
-                        "lsh_candidate": is_lsh_candidate
+                        "lsh_candidate": is_lsh,
                     })
         return {
             "pairwise": pairwise,
-            "lsh_candidates_count": len(lsh_candidates)
+            "lsh_candidates_count": len(lsh_candidates),
+            "evaluated_rules": len(rules),
+            "total_rules": len(self._rules),
         }
 
     def kg(self) -> Dict[str, Any]:

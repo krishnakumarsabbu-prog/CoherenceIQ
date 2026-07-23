@@ -27,11 +27,18 @@ class GraphEngine:
         for r in rules:
             r_node = f"rule:{r.rule_id}"
             self.G.add_node(r_node, type="rule", label=r.rule_name, cluster=r.primary_cluster)
+            rule_param_set = {p.lower() for p in r.parameters}
             for f in features:
                 if r.rule_id in f.derived_rules:
-                    # Weight represents the degree of dependency (e.g. parameter overlap ratio or 1.0)
-                    self.G.add_edge(r_node, f"feature:{f.feature_name}", weight=1.0, kind="rule-feature")
-                    
+                    # Weight = fraction of feature's blueprint params present in this rule's params
+                    feature_param_set = {p.lower() for p in f.blueprint_parameters}
+                    if feature_param_set:
+                        overlap = len(rule_param_set & feature_param_set) / len(feature_param_set)
+                    else:
+                        overlap = 1.0
+                    weight = round(max(overlap, 0.1), 4)  # Floor at 0.1 so edge is never invisible
+                    self.G.add_edge(r_node, f"feature:{f.feature_name}", weight=weight, kind="rule-feature")
+
         return self.G
 
     def compute_pagerank(self) -> Dict[str, float]:

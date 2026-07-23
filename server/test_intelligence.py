@@ -109,25 +109,27 @@ Parameters:
     def test_graph_and_kg_engine(self) -> None:
         graph_engine = GraphEngine()
         kg_builder = KnowledgeGraphBuilder()
-        
+
         features = [
             EngineeredFeature(
                 feature_name="DeviceTrustScore",
                 domain="Device Intelligence",
                 derived_rules=[self.mock_rule.rule_id],
                 derived_parameters=self.mock_rule.parameters,
+                blueprint_parameters=["New Device", "Device Age", "Fingerprint"],
                 weight=0.25,
                 description="Custom test feature",
-                used_by=["Coherence Brain"]
+                used_by=["Coherence Brain"],
+                is_active=True,
             )
         ]
-        
+
         G = graph_engine.build_dependency_graph([self.mock_rule], features)
         self.assertTrue(len(G) > 0)
-        
+
         pageranks = graph_engine.compute_pagerank()
         self.assertIn(f"rule:{self.mock_rule.rule_id}", pageranks)
-        
+
         communities = graph_engine.detect_louvain_communities()
         self.assertTrue(len(communities) > 0)
 

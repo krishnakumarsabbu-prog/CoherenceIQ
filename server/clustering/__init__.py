@@ -1,20 +1,35 @@
 from __future__ import annotations
-from typing import List, Dict, Tuple
+from typing import List, Dict
 from models import Rule, Cluster
 from intelligence.clustering import HybridClusteringEngine, TaxonomyEngine, DEFAULT_TAXONOMY
 
 
-def classify_rule(rule: Rule, taxonomy: Dict[str, List[str]] = DEFAULT_TAXONOMY) -> None:
-    """Classifies a rule using the new enterprise HybridClusteringEngine."""
+def batch_classify_rules(
+    rules: List[Rule],
+    taxonomy: Dict[str, List[str]] = DEFAULT_TAXONOMY,
+) -> None:
+    """Classifies all rules in a single batch using full-corpus TF-IDF.
+
+    A single HybridClusteringEngine and a single TF-IDF matrix are built for
+    the entire rule corpus — O(1) engine instantiations instead of O(N).
+    Results are written back onto each Rule in-place.
+    """
+    if not rules:
+        return
     tax_engine = TaxonomyEngine(taxonomy)
     engine = HybridClusteringEngine(tax_engine)
-    res = engine.classify(rule, [rule])
-    
-    rule.primary_cluster = res["primary"]
-    rule.secondary_cluster = res["secondary"]
-    rule.confidence = res["confidence"]
-    rule.matched_keywords = res["matched_keywords"]
-    rule.matched_classification_rules = res["reasoning"]
+    results = engine.classify_batch(rules)
+    for rule, res in zip(rules, results):
+        rule.primary_cluster = res["primary"]
+        rule.secondary_cluster = res["secondary"]
+        rule.confidence = res["confidence"]
+        rule.matched_keywords = res["matched_keywords"]
+        rule.matched_classification_rules = res["reasoning"]
+
+
+def classify_rule(rule: Rule, taxonomy: Dict[str, List[str]] = DEFAULT_TAXONOMY) -> None:
+    """Classifies a single rule (convenience wrapper — use batch_classify_rules for bulk work)."""
+    batch_classify_rules([rule], taxonomy)
 
 
 def build_clusters(rules: List[Rule], taxonomy: Dict[str, List[str]] = DEFAULT_TAXONOMY) -> List[Cluster]:
