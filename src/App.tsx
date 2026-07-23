@@ -11,6 +11,7 @@ import { RuleStudioPage } from "@/pages/RuleStudioPage";
 import { GraphIntelligencePage } from "@/pages/GraphIntelligencePage";
 import { TemporalIntelligencePage } from "@/pages/TemporalIntelligencePage";
 import { CoherenceBrainPage } from "@/pages/CoherenceBrainPage";
+import { SessionValidationStudioPage } from "@/pages/SessionValidationStudioPage";
 import { CopilotPage } from "@/pages/CopilotPage";
 import { ReplayStudioPage } from "@/pages/ReplayStudioPage";
 import { ModelStudioPage } from "@/pages/ModelStudioPage";
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="graph" element={<GraphIntelligencePage />} />
         <Route path="temporal" element={<TemporalIntelligencePage />} />
         <Route path="brain" element={<CoherenceBrainPage />} />
+        <Route path="session-validation" element={<SessionValidationStudioPage />} />
         <Route path="replay" element={<ReplayStudioPage />} />
         <Route path="model" element={<ModelStudioPage />} />
         <Route path="copilot" element={<CopilotPage />} />

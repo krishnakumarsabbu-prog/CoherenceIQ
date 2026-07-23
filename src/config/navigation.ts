@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Search, FileSearch, FolderSearch, Layers3, Gavel, Puzzle, Share2,
-  Clock, Brain, History, Cpu, Sparkles, Settings, type LucideIcon,
+  Clock, Brain, History, Cpu, Sparkles, Settings, ShieldCheck, type LucideIcon,
 } from "lucide-react";
 
 export interface NavModule {
@@ -24,6 +24,7 @@ export const NAV_MODULES: NavModule[] = [
   { id: "graph-intelligence", label: "Graph Intelligence", path: "/graph", icon: Share2, group: "Intelligence", description: "Entity relationship graph" },
   { id: "temporal-intelligence", label: "Temporal Intelligence", path: "/temporal", icon: Clock, group: "Intelligence", description: "Time-series anomaly detection" },
   { id: "coherence-brain", label: "Coherence Brain", path: "/brain", icon: Brain, group: "Intelligence", description: "Core ML inference engine" },
+  { id: "session-validation", label: "Session Validation Studio", path: "/session-validation", icon: ShieldCheck, group: "Studio", description: "Validate login sessions against the full rule intelligence pipeline" },
   { id: "replay-studio", label: "Replay Studio", path: "/replay", icon: History, group: "Studio", description: "Replay sessions step-by-step" },
   { id: "model-studio", label: "Model Studio", path: "/model", icon: Cpu, group: "Studio", description: "Train & evaluate models" },
   { id: "ai-copilot", label: "AI Copilot", path: "/copilot", icon: Sparkles, group: "Studio", description: "Conversational risk assistant", badge: "AI" },

@@ -13,6 +13,7 @@ const LABELS: Record<string, string> = {
   graph: "Graph Intelligence",
   temporal: "Temporal Intelligence",
   brain: "Coherence Brain",
+  "session-validation": "Session Validation Studio",
   replay: "Replay Studio",
   model: "Model Studio",
   copilot: "AI Copilot",

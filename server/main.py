@@ -1,10 +1,13 @@
 from __future__ import annotations
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
+import json as _json
 from models import Rule
 from store import RuleStore
+from session_validation import session_validation_service, SAMPLE_PAYLOADS, generate_random_session
 
 
 app = FastAPI(title="Coherence AI — Rule Intelligence", version="1.0.0")
@@ -18,6 +21,9 @@ app.add_middleware(
 
 store = RuleStore()
 store.seed_if_empty()
+
+# Share the main store with the session validation service so it sees uploaded rules
+session_validation_service.store = store
 
 
 @app.get("/api/health")
@@ -122,3 +128,55 @@ def seed_rules() -> Dict:
     store.clear()
     store.seed_if_empty()
     return {"total": len(store.all_rules())}
+
+
+# ---------------------------------------------------------------------------
+# Session Validation Studio
+# ---------------------------------------------------------------------------
+
+class ValidationRequest(BaseModel):
+    raw_input: str
+    content_type: str = "json"
+
+
+@app.post("/api/session-validation/run")
+def run_session_validation(req: ValidationRequest) -> Dict[str, Any]:
+    return session_validation_service.run_validation(req.raw_input, req.content_type)
+
+
+@app.get("/api/session-validation/history")
+def get_validation_history() -> List[Dict[str, Any]]:
+    return session_validation_service.get_history()
+
+
+@app.get("/api/session-validation/{session_id}")
+def get_validation_session(session_id: str) -> Dict[str, Any]:
+    result = session_validation_service.get_session(session_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
+    return result
+
+
+@app.get("/api/session-validation/report/{session_id}", response_class=PlainTextResponse)
+def get_validation_report(session_id: str) -> str:
+    report = session_validation_service.get_report(session_id)
+    if report is None:
+        raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
+    return _json.dumps(report, indent=2, default=str)
+
+
+@app.get("/api/session-validation/samples/list")
+def get_sample_payloads() -> List[Dict[str, str]]:
+    return [{"label": s["label"], "content_type": s["content_type"]} for s in SAMPLE_PAYLOADS]
+
+
+@app.get("/api/session-validation/samples/{index}")
+def get_sample_payload(index: int) -> Dict[str, str]:
+    if index < 0 or index >= len(SAMPLE_PAYLOADS):
+        raise HTTPException(status_code=404, detail="Sample not found")
+    return SAMPLE_PAYLOADS[index]
+
+
+@app.get("/api/session-validation/random-session")
+def get_random_session() -> Dict[str, str]:
+    return generate_random_session()
