@@ -1,12 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ShieldCheck, Upload, FileJson, FileText, FileCode, Sparkles, Dice5,
-  Play, Download, GitCompare, Clock, CheckCircle2, AlertTriangle, XCircle,
-  ChevronDown, ChevronRight, Activity, Zap, Brain, Target, Gauge,
-  Network, MapPin, KeyRound, User, CreditCard, Smartphone, Globe,
-  Server, Cpu, Layers, Eye, FileDown, History as HistoryIcon, Share2,
-} from "lucide-react";
+import { ShieldCheck, Upload, FileJson, FileText, FileCode, Sparkles, Dice5, Play, Download, GitCompare, Clock, CircleCheck as CheckCircle2, TriangleAlert as AlertTriangle, Circle as XCircle, ChevronDown, ChevronRight, Activity, Zap, Brain, Target, Gauge, Network, MapPin, KeyRound, User, CreditCard, Smartphone, Globe, Server, Cpu, Layers, Eye, FileDown, History as HistoryIcon, Share2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { sessionValidationApi, type ValidationResult, type HistoryEntry } from "@/lib/sessionValidationData";
 import { Badge } from "@/components/ui/badge";
