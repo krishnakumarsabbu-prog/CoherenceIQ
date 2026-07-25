@@ -1,20 +1,26 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Settings2, Play, Trash2, ChevronRight } from "lucide-react";
+import { X, Settings2, Play, Trash2, ChevronRight, TriangleAlert as AlertTriangle, CircleAlert as AlertCircle } from "lucide-react";
+import { useState } from "react";
 import { NODE_TYPE_MAP, type PipelineNode } from "@/lib/pipelineData";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import type { ValidationIssue } from "@/lib/pipelineValidation";
 
 interface NodeConfigPanelProps {
   node: PipelineNode | null;
   open: boolean;
+  issues: ValidationIssue[];
   onClose: () => void;
   onUpdate: (id: string, patch: Partial<PipelineNode["data"]>) => void;
   onDelete: (id: string) => void;
+  onRunNode?: (id: string) => void;
 }
 
-export function NodeConfigPanel({ node, open, onClose, onUpdate, onDelete }: NodeConfigPanelProps) {
+export function NodeConfigPanel({ node, open, issues, onClose, onUpdate, onDelete, onRunNode }: NodeConfigPanelProps) {
   const def = node ? NODE_TYPE_MAP[node.type] : null;
+  const nodeIssues = node ? issues.filter((i) => i.nodeId === node.id) : [];
+
   return (
     <AnimatePresence>
       {open && node && def && (
@@ -49,7 +55,28 @@ export function NodeConfigPanel({ node, open, onClose, onUpdate, onDelete }: Nod
               <Badge variant="outline">{def.outputs} out</Badge>
             </div>
 
-            <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            {nodeIssues.length > 0 && (
+              <div className="mb-4 space-y-1.5">
+                {nodeIssues.map((iss) => (
+                  <div
+                    key={iss.id}
+                    className={cn(
+                      "flex items-start gap-2 rounded-md border px-2.5 py-2 text-[11px]",
+                      iss.severity === "error"
+                        ? "border-destructive/30 bg-destructive/10 text-destructive"
+                        : "border-warning/30 bg-warning/10 text-warning",
+                    )}
+                  >
+                    {iss.severity === "error" ? <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> : <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />}
+                    <span>{iss.message}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <LabelEditor node={node} onUpdate={onUpdate} />
+
+            <div className="mb-2 mt-4 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               <Settings2 className="h-3 w-3" /> Configuration
             </div>
             <div className="space-y-2.5">
@@ -61,6 +88,11 @@ export function NodeConfigPanel({ node, open, onClose, onUpdate, onDelete }: Nod
                   onChange={(v) => onUpdate(node.id, { config: { ...node.data.config, [key]: v } })}
                 />
               ))}
+              {Object.keys(node.data.config).length === 0 && (
+                <div className="rounded-md border border-dashed border-border px-3 py-4 text-center text-[11px] text-muted-foreground">
+                  No configurable properties for this node type.
+                </div>
+              )}
             </div>
 
             {node.data.assetRef && (
@@ -77,7 +109,7 @@ export function NodeConfigPanel({ node, open, onClose, onUpdate, onDelete }: Nod
             <Button size="sm" variant="outline" className="flex-1" onClick={() => onDelete(node.id)}>
               <Trash2 className="h-3.5 w-3.5" /> Remove
             </Button>
-            <Button size="sm" className="flex-1">
+            <Button size="sm" className="flex-1" onClick={() => onRunNode?.(node.id)} disabled={!onRunNode}>
               <Play className="h-3.5 w-3.5" /> Run node
             </Button>
           </div>
@@ -87,14 +119,45 @@ export function NodeConfigPanel({ node, open, onClose, onUpdate, onDelete }: Nod
   );
 }
 
+function LabelEditor({ node, onUpdate }: { node: PipelineNode; onUpdate: (id: string, patch: Partial<PipelineNode["data"]>) => void }) {
+  return (
+    <div className="mb-3">
+      <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Label</label>
+      <input
+        value={node.data.label}
+        onChange={(e) => onUpdate(node.id, { label: e.target.value })}
+        className="h-8 w-full rounded-md border border-border bg-background px-3 text-[12px] text-foreground focus:border-primary focus:outline-none"
+      />
+    </div>
+  );
+}
+
+const SELECT_HINTS: Record<string, string[]> = {
+  method: ["POST", "PUT", "PATCH", "GET"],
+  mode: ["count", "collection"],
+  strategy: ["wait-all", "first-ready"],
+  algorithm: ["dbscan", "kmeans", "agglomerative"],
+  clusterAlgorithm: ["dbscan", "kmeans", "agglomerative"],
+  environment: ["staging", "production", "sandbox"],
+  sink: ["prometheus", "datadog", "cloudwatch"],
+  source: ["session-store", "event-stream", "dataset"],
+  split: ["train", "test", "validation"],
+  model: ["gpt-4o", "claude-3.5-sonnet", "internal-llm"],
+};
+
 function ConfigField({ k, value, onChange }: { k: string; value: unknown; onChange: (v: unknown) => void }) {
   const isBool = typeof value === "boolean";
   const isNum = typeof value === "number";
   const isArr = Array.isArray(value);
-  return (
-    <div>
-      <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{k}</label>
-      {isBool ? (
+  const isLongText = k === "expression" || k === "url" || k === "filter" || k === "text";
+  const options = SELECT_HINTS[k];
+
+  const [arrDraft, setArrDraft] = useState(isArr ? (value as unknown[]).join(", ") : "");
+
+  if (isBool) {
+    return (
+      <div>
+        <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{k}</label>
         <button
           onClick={() => onChange(!value)}
           className={cn("flex h-8 w-full items-center justify-between rounded-md border border-border px-3 text-[12px]", value ? "bg-primary/10 text-primary" : "text-muted-foreground")}
@@ -104,11 +167,52 @@ function ConfigField({ k, value, onChange }: { k: string; value: unknown; onChan
             <span className={cn("absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all", value ? "left-3.5" : "left-0.5")} />
           </span>
         </button>
-      ) : isArr ? (
+      </div>
+    );
+  }
+
+  if (options && !isArr) {
+    return (
+      <div>
+        <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{k}</label>
+        <select
+          value={String(value ?? "")}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-8 w-full rounded-md border border-border bg-background px-2 text-[12px] text-foreground focus:border-primary focus:outline-none"
+        >
+          {options.map((o) => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  if (isArr) {
+    return (
+      <div>
+        <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{k}</label>
         <input
-          value={value.join(", ")}
-          onChange={(e) => onChange(e.target.value.split(",").map((s) => s.trim()))}
+          value={arrDraft}
+          onChange={(e) => {
+            setArrDraft(e.target.value);
+            onChange(e.target.value.split(",").map((s) => s.trim()).filter(Boolean));
+          }}
           className="h-8 w-full rounded-md border border-border bg-background px-3 font-mono text-[11px] text-foreground focus:border-primary focus:outline-none"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{k}</label>
+      {isLongText ? (
+        <textarea
+          value={String(value ?? "")}
+          onChange={(e) => onChange(e.target.value)}
+          rows={2}
+          className="w-full rounded-md border border-border bg-background px-3 py-2 text-[12px] text-foreground focus:border-primary focus:outline-none"
         />
       ) : (
         <input

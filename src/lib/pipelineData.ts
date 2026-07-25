@@ -2,10 +2,10 @@ import type { LucideIcon } from "lucide-react";
 import {
   Share2, Clock, Brain, History, Cpu, Sparkles, ShieldCheck, Layers3,
   Boxes, Workflow, Gavel, Database, Activity, GitBranch, Gauge,
-  type LucideIcon as _LucideIcon,
+  Split, Repeat, Merge as MergeIcon, MessageSquare, type LucideIcon as _LucideIcon,
 } from "lucide-react";
 
-export type NodeCategory = "source" | "intelligence" | "model" | "decision" | "output" | "governance";
+export type NodeCategory = "source" | "intelligence" | "model" | "decision" | "output" | "governance" | "flow";
 export type NodeStatus = "idle" | "running" | "success" | "error" | "warning";
 export type ExecutionStatus = "queued" | "running" | "succeeded" | "failed" | "cancelled" | "warning";
 export type AssetKind =
@@ -21,6 +21,8 @@ export interface NodeTypeDef {
   description: string;
   inputs: number;
   outputs: number;
+  inputHandles?: string[];
+  outputHandles?: string[];
   defaultConfig: Record<string, unknown>;
 }
 
@@ -114,6 +116,10 @@ export const NODE_TYPES: NodeTypeDef[] = [
   { type: "decision-router", label: "Decision Router", category: "decision", icon: GitBranch, color: "#ef4444", description: "Route decisions to allow, challenge, or deny based on scores.", inputs: 2, outputs: 3, defaultConfig: { allowThreshold: 40, challengeThreshold: 75 } },
   { type: "webhook-output", label: "Webhook Output", category: "output", icon: Activity, color: "#84cc16", description: "Emit pipeline results to an external webhook.", inputs: 1, outputs: 0, defaultConfig: { url: "", method: "POST" } },
   { type: "metrics-output", label: "Metrics Output", category: "output", icon: Gauge, color: "#3b82f6", description: "Publish pipeline metrics to the observability backend.", inputs: 1, outputs: 0, defaultConfig: { sink: "prometheus" } },
+  { type: "condition", label: "Condition", category: "flow", icon: Split, color: "#f59e0b", description: "Branch execution based on a boolean expression. Routes to the true or false output.", inputs: 1, outputs: 2, outputHandles: ["true", "false"], defaultConfig: { expression: "score > 0.7" } },
+  { type: "loop", label: "Loop", category: "flow", icon: Repeat, color: "#0d9488", description: "Iterate over a collection or repeat for a fixed number of iterations.", inputs: 1, outputs: 1, defaultConfig: { mode: "count", iterations: 5, collectionPath: "" } },
+  { type: "merge", label: "Merge", category: "flow", icon: MergeIcon, color: "#64748b", description: "Combine multiple branches into a single stream. Waits for all inputs by default.", inputs: 4, outputs: 1, defaultConfig: { strategy: "wait-all", deduplicate: true } },
+  { type: "comment", label: "Comment", category: "flow", icon: MessageSquare, color: "#94a3b8", description: "Add a note or annotation to the canvas. Does not execute.", inputs: 0, outputs: 0, defaultConfig: { text: "Add a note…" } },
 ];
 
 export const NODE_TYPE_MAP: Record<string, NodeTypeDef> = Object.fromEntries(
@@ -127,6 +133,7 @@ export const CATEGORY_META: Record<NodeCategory, { label: string; color: string 
   decision: { label: "Decisions", color: "#ef4444" },
   output: { label: "Outputs", color: "#84cc16" },
   governance: { label: "Governance", color: "#6366f1" },
+  flow: { label: "Flow Control", color: "#f59e0b" },
 };
 
 const now = () => new Date().toISOString();
