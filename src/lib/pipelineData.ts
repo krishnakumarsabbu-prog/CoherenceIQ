@@ -6,8 +6,8 @@ import {
 } from "lucide-react";
 
 export type NodeCategory = "source" | "intelligence" | "model" | "decision" | "output" | "governance" | "flow";
-export type NodeStatus = "idle" | "running" | "success" | "error" | "warning";
-export type ExecutionStatus = "queued" | "running" | "succeeded" | "failed" | "cancelled" | "warning";
+export type NodeStatus = "idle" | "waiting" | "running" | "success" | "error" | "warning" | "skipped";
+export type ExecutionStatus = "queued" | "running" | "succeeded" | "failed" | "cancelled" | "warning" | "skipped";
 export type AssetKind =
   | "pipeline" | "rule-set" | "model" | "feature-set" | "graph"
   | "temporal-profile" | "session-validator" | "replay" | "copilot-agent" | "dataset";

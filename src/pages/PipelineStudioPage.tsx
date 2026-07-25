@@ -6,7 +6,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Save, Plus, Copy, Trash2, Sparkles, History, ChevronDown, GitCommitVertical as GitCommit, LayoutGrid, Clipboard, ClipboardCheck, Undo2, Redo2, MessageSquarePlus, CircleCheck as CheckCircle2, CircleAlert as AlertCircle, TriangleAlert as AlertTriangle, FolderPlus, Search, Pencil } from "lucide-react";
+import { Play, Save, Plus, Copy, Trash2, Sparkles, History, ChevronDown, GitCommitVertical as GitCommit, LayoutGrid, Clipboard, ClipboardCheck, Undo2, Redo2, MessageSquarePlus, CircleCheck as CheckCircle2, CircleAlert as AlertCircle, TriangleAlert as AlertTriangle, FolderPlus, Search, Pencil, Square } from "lucide-react";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,7 @@ import { pipelineStore, type PipelineDocument } from "@/lib/pipelineStore";
 import { usePipelineStore } from "@/lib/usePipelineStore";
 import { autoLayout } from "@/lib/pipelineLayout";
 import { validatePipeline, issueCounts, type ValidationIssue } from "@/lib/pipelineValidation";
+import { startExecution, streamExecutionEvents, cancelExecution, type ExecutionEvent } from "@/lib/executionApi";
 import { PipelineNode as PipelineNodeComp, type PipelineNodeData } from "@/components/pipeline/PipelineNode";
 import { NodePalette } from "@/components/pipeline/NodePalette";
 import { NodeConfigPanel } from "@/components/pipeline/NodeConfigPanel";
@@ -55,6 +56,8 @@ function PipelineStudioInner() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [configOpen, setConfigOpen] = useState(false);
   const [running, setRunning] = useState(false);
+  const [activeExecutionId, setActiveExecutionId] = useState<string | null>(null);
+  const stopStreamRef = useRef<(() => void) | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [versionOpen, setVersionOpen] = useState(false);
   const [validationOpen, setValidationOpen] = useState(false);
@@ -191,25 +194,63 @@ function PipelineStudioInner() {
 
   const counts = useMemo(() => issueCounts(issues), [issues]);
 
-  const runPipeline = useCallback(() => {
+  const mapStepStatus = (s: string): NodeStatus => {
+    switch (s) {
+      case "running": return "running";
+      case "succeeded": return "success";
+      case "failed": return "error";
+      case "warning": return "warning";
+      case "skipped": return "skipped";
+      default: return "waiting";
+    }
+  };
+
+  const runPipeline = useCallback(async () => {
     if (counts.errors > 0) {
       setValidationOpen(true);
       showToast("Fix errors before running");
       return;
     }
+    if (!doc) return;
     setRunning(true);
-    const ids = rfNodes.filter((n) => n.data.__nodeType !== "comment").map((n) => n.id);
-    setRfNodes((ns) => ns.map((n) => ({ ...n, data: { ...n.data, status: "queued" as NodeStatus } })));
-    ids.forEach((id, i) => {
-      setTimeout(() => {
-        setRfNodes((ns) => ns.map((n) => (n.id === id ? { ...n, data: { ...n.data, status: "running" as NodeStatus } } : n)));
-        setTimeout(() => {
-          setRfNodes((ns) => ns.map((n) => (n.id === id ? { ...n, data: { ...n.data, status: "success" as NodeStatus } } : n)));
-          if (i === ids.length - 1) setRunning(false);
-        }, 500);
-      }, i * 350);
-    });
-  }, [counts.errors, rfNodes, setRfNodes, showToast]);
+    setRfNodes((ns) => ns.map((n) => ({ ...n, data: { ...n.data, status: "waiting" as NodeStatus } })));
+    try {
+      const ex = await startExecution(doc.id, "ui");
+      setActiveExecutionId(ex.id);
+      const stop = streamExecutionEvents(
+        ex.id,
+        (evt: ExecutionEvent) => {
+          if (evt.type === "node_started" && evt.nodeId) {
+            setRfNodes((ns) => ns.map((n) => (n.id === evt.nodeId ? { ...n, data: { ...n.data, status: "running" as NodeStatus } } : n)));
+          } else if (evt.type === "node_finished" && evt.nodeId) {
+            const st = mapStepStatus(evt.status ?? "succeeded");
+            setRfNodes((ns) => ns.map((n) => (n.id === evt.nodeId ? { ...n, data: { ...n.data, status: st } } : n)));
+          } else if (evt.type === "node_skipped" && evt.nodeId) {
+            setRfNodes((ns) => ns.map((n) => (n.id === evt.nodeId ? { ...n, data: { ...n.data, status: "skipped" as NodeStatus } } : n)));
+          } else if (evt.type === "finished") {
+            setRunning(false);
+            setActiveExecutionId(null);
+            showToast(evt.status === "succeeded" ? "Pipeline completed" : `Pipeline ${evt.status}`);
+          }
+        },
+        () => { setRunning(false); setActiveExecutionId(null); },
+      );
+      stopStreamRef.current = stop;
+    } catch {
+      setRunning(false);
+      showToast("Failed to start execution");
+    }
+  }, [counts.errors, doc, setRfNodes, showToast]);
+
+  const cancelPipeline = useCallback(async () => {
+    if (!activeExecutionId) return;
+    try { await cancelExecution(activeExecutionId); } catch { /* ignore */ }
+    stopStreamRef.current?.();
+    setRunning(false);
+    setActiveExecutionId(null);
+    setRfNodes((ns) => ns.map((n) => (n.data.status === "running" || n.data.status === "waiting" ? { ...n, data: { ...n.data, status: "skipped" as NodeStatus } } : n)));
+    showToast("Execution cancelled");
+  }, [activeExecutionId, setRfNodes, showToast]);
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -410,9 +451,15 @@ function PipelineStudioInner() {
           <Button variant="outline" size="sm" onClick={() => setVersionOpen(true)}><History className="h-3.5 w-3.5" /> Versions <Badge variant="outline" className="ml-1 text-[9px]">{doc.versions.length}</Badge></Button>
           <Button variant="outline" size="sm" onClick={savePipeline}><Save className="h-3.5 w-3.5" /> Save</Button>
           <Button size="sm" onClick={publishPipeline} disabled={counts.errors > 0}><GitCommit className="h-3.5 w-3.5" /> Publish</Button>
-          <Button size="sm" onClick={runPipeline} disabled={running}>
-            {running ? <><Sparkles className="h-3.5 w-3.5 animate-pulse" /> Running…</> : <><Play className="h-3.5 w-3.5" /> Run</>}
-          </Button>
+          {running ? (
+            <Button size="sm" variant="destructive" onClick={cancelPipeline}>
+              <Square className="h-3.5 w-3.5" /> Cancel
+            </Button>
+          ) : (
+            <Button size="sm" onClick={runPipeline}>
+              <Play className="h-3.5 w-3.5" /> Run
+            </Button>
+          )}
         </div>
       </div>
 

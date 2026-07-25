@@ -6,10 +6,12 @@ import { NODE_TYPE_MAP, type NodeStatus } from "@/lib/pipelineData";
 
 const STATUS_DOT: Record<NodeStatus, string> = {
   idle: "bg-muted-foreground/40",
+  waiting: "bg-muted-foreground/40 ring-2 ring-muted-foreground/30",
   running: "bg-primary animate-pulse",
   success: "bg-success",
   error: "bg-destructive",
   warning: "bg-warning",
+  skipped: "bg-muted-foreground/20 ring-2 ring-muted-foreground/20",
 };
 
 export interface PipelineNodeData {
@@ -28,6 +30,25 @@ function PipelineNodeComponent({ id, data, selected }: NodeProps) {
   const def = NODE_TYPE_MAP[d.__nodeType] ?? NODE_TYPE_MAP["session-source"];
   const Icon = def.icon;
   const status = d.status ?? "idle";
+
+  const statusBorder: Record<NodeStatus, string> = {
+    idle: "",
+    waiting: "border-muted-foreground/40",
+    running: "border-primary ring-2 ring-primary/30",
+    success: "border-success/60",
+    error: "border-destructive/70",
+    warning: "border-warning/70",
+    skipped: "border-muted-foreground/20 border-dashed",
+  };
+  const statusGlow: Record<NodeStatus, string> = {
+    running: "0 0 18px hsl(var(--primary) / 0.35)",
+    success: "0 0 14px hsl(var(--success) / 0.25)",
+    error: "0 0 14px hsl(var(--destructive) / 0.3)",
+    idle: "",
+    waiting: "",
+    warning: "",
+    skipped: "",
+  };
 
   if (d.__isComment || d.__nodeType === "comment") {
     return (
@@ -57,9 +78,10 @@ function PipelineNodeComponent({ id, data, selected }: NodeProps) {
       transition={{ duration: 0.18 }}
       className={cn(
         "group relative flex w-[200px] cursor-pointer flex-col gap-1 rounded-xl border bg-card/90 px-3 py-2.5 backdrop-blur-xl transition-all",
-        selected ? "border-primary ring-2 ring-primary/40" : "border-border hover:border-primary/40",
+        selected ? "border-primary ring-2 ring-primary/40" : statusBorder[status],
+        "hover:border-primary/40",
       )}
-      style={{ boxShadow: selected ? `0 0 24px ${def.color}33` : undefined }}
+      style={{ boxShadow: selected ? `0 0 24px ${def.color}33` : statusGlow[status] || undefined }}
     >
       {inputHandles.map((h) => (
         <Handle
