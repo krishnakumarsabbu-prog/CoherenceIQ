@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Layers3, ShieldCheck, Boxes } from "lucide-react";
+import { Layers3, ShieldCheck, Boxes, Gavel } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/rulestudio/RuleStudioTabs";
 import { RuleIntelligencePage } from "@/pages/RuleIntelligencePage";
 import { SessionValidationStudioPage } from "@/pages/SessionValidationStudioPage";
+import { GovernanceWorkspacePage } from "@/pages/GovernanceWorkspacePage";
 import { useNavigate } from "react-router-dom";
 
-type Tab = "intelligence" | "validation";
+type Tab = "workspace" | "intelligence" | "validation";
 
 export function GovernancePage() {
-  const [tab, setTab] = useState<Tab>("intelligence");
+  const [tab, setTab] = useState<Tab>("workspace");
   const navigate = useNavigate();
 
   return (
@@ -17,6 +18,7 @@ export function GovernancePage() {
         <div className="flex items-center justify-between border-b border-border px-5 pt-4 lg:px-6">
           <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Governance</span>
           <TabsList>
+            <TabsTrigger value="workspace"><Gavel className="h-3.5 w-3.5" /> Workspace</TabsTrigger>
             <TabsTrigger value="intelligence"><Layers3 className="h-3.5 w-3.5" /> Rule Intelligence</TabsTrigger>
             <TabsTrigger value="validation"><ShieldCheck className="h-3.5 w-3.5" /> Session Validation</TabsTrigger>
             <button
@@ -27,6 +29,10 @@ export function GovernancePage() {
             </button>
           </TabsList>
         </div>
+
+        <TabsContent value="workspace" className="flex-1 overflow-hidden">
+          <GovernanceWorkspacePage />
+        </TabsContent>
 
         <TabsContent value="intelligence" className="flex-1 overflow-hidden">
           <RuleIntelligencePage />
