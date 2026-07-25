@@ -1,6 +1,6 @@
 import {
-  LayoutDashboard, Search, FileSearch, FolderSearch, Layers3, Gavel, Puzzle, Share2,
-  Clock, Brain, History, Cpu, Sparkles, Settings, ShieldCheck, type LucideIcon,
+  Workflow, LayoutDashboard, Boxes, Activity, Gavel, Sparkles, Store, Settings,
+  type LucideIcon,
 } from "lucide-react";
 
 export interface NavModule {
@@ -8,35 +8,27 @@ export interface NavModule {
   label: string;
   path: string;
   icon: LucideIcon;
-  group: "Operate" | "Investigate" | "Govern" | "Intelligence" | "Studio";
+  group: "Build" | "Operate" | "Govern";
   description: string;
   badge?: string;
 }
 
 export const NAV_MODULES: NavModule[] = [
+  { id: "pipeline-studio", label: "Pipeline Studio", path: "/pipelines", icon: Workflow, group: "Build", description: "Design and run executable pipelines on a visual canvas" },
+  { id: "assets", label: "Assets", path: "/assets", icon: Boxes, group: "Build", description: "Reusable rule sets, models, feature sets, graphs & datasets" },
+  { id: "executions", label: "Executions", path: "/executions", icon: Activity, group: "Build", description: "Run history, logs, and per-step results" },
   { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, group: "Operate", description: "Executive risk overview & KPIs" },
-  { id: "session-explorer", label: "Session Explorer", path: "/sessions", icon: Search, group: "Investigate", description: "Search & filter all login sessions" },
-  { id: "session-investigation", label: "Session Investigation", path: "/sessions/S-10000", icon: FileSearch, group: "Investigate", description: "Deep-dive a single session", badge: "PRO" },
-  { id: "evidence-explorer", label: "Evidence Explorer", path: "/evidence", icon: FolderSearch, group: "Investigate", description: "Forensic evidence vault" },
-  { id: "rule-intelligence", label: "Rule Intelligence", path: "/rule-intelligence", icon: Layers3, group: "Govern", description: "Parse, cluster, and engineer rule features" },
-  { id: "rule-studio", label: "Rule Studio", path: "/rules", icon: Gavel, group: "Govern", description: "Author & test risk rules" },
-  { id: "plugin-marketplace", label: "Plugin Marketplace", path: "/plugins", icon: Puzzle, group: "Govern", description: "Install detection plugins" },
-  { id: "graph-intelligence", label: "Graph Intelligence", path: "/graph", icon: Share2, group: "Intelligence", description: "Entity relationship graph" },
-  { id: "temporal-intelligence", label: "Temporal Intelligence", path: "/temporal", icon: Clock, group: "Intelligence", description: "Time-series anomaly detection" },
-  { id: "coherence-brain", label: "Coherence Brain", path: "/brain", icon: Brain, group: "Intelligence", description: "Core ML inference engine" },
-  { id: "session-validation", label: "Session Validation Studio", path: "/session-validation", icon: ShieldCheck, group: "Studio", description: "Validate login sessions against the full rule intelligence pipeline" },
-  { id: "replay-studio", label: "Replay Studio", path: "/replay", icon: History, group: "Studio", description: "Replay sessions step-by-step" },
-  { id: "model-studio", label: "Model Studio", path: "/model", icon: Cpu, group: "Studio", description: "Train & evaluate models" },
-  { id: "ai-copilot", label: "AI Copilot", path: "/copilot", icon: Sparkles, group: "Studio", description: "Conversational risk assistant", badge: "AI" },
-  { id: "administration", label: "Administration", path: "/admin", icon: Settings, group: "Govern", description: "Tenant & user management" },
+  { id: "governance", label: "Governance", path: "/governance", icon: Gavel, group: "Govern", description: "Rule intelligence, rule authoring, and session validation" },
+  { id: "marketplace", label: "Marketplace", path: "/marketplace", icon: Store, group: "Govern", description: "Install detection plugins and pipeline templates" },
+  { id: "administration", label: "Administration", path: "/admin", icon: Settings, group: "Govern", description: "Tenant, users, and environment management" },
 ];
 
-export const NAV_GROUPS: NavModule["group"][] = ["Operate", "Investigate", "Govern", "Intelligence", "Studio"];
+export const NAV_GROUPS: NavModule["group"][] = ["Build", "Operate", "Govern"];
 
 export const ALL_COMMANDS = [
   ...NAV_MODULES.map((m) => ({ id: m.id, label: m.label, hint: `Go to ${m.label}`, path: m.path, icon: m.icon, group: "Navigation" })),
-  { id: "cmd-palette", label: "Command Palette", hint: "Open command palette", path: "", icon: Search, group: "Actions" },
+  { id: "cmd-palette", label: "Command Palette", hint: "Open command palette", path: "", icon: Workflow, group: "Actions" },
   { id: "toggle-theme", label: "Toggle Theme", hint: "Switch light / dark", path: "", icon: Settings, group: "Actions" },
-  { id: "notifications", label: "Notifications", hint: "View notifications", path: "", icon: Clock, group: "Actions" },
+  { id: "notifications", label: "Notifications", hint: "View notifications", path: "", icon: Activity, group: "Actions" },
   { id: "sign-out", label: "Sign Out", hint: "End your session", path: "", icon: Settings, group: "Actions" },
 ];

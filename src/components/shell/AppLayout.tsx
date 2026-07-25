@@ -40,7 +40,7 @@ export function AppLayout() {
   const handleAction = (id: string) => {
     if (id === "toggle-theme") toggle();
     else if (id === "sign-out") signOut();
-    else if (id === "notifications") navigate("/dashboard");
+    else if (id === "notifications") navigate("/executions");
   };
 
   const sessionParams = useParams<{ id: string }>();

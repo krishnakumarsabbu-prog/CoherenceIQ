@@ -4,27 +4,21 @@ import { ChevronRight } from "lucide-react";
 import { Fragment } from "react";
 
 const LABELS: Record<string, string> = {
+  pipelines: "Pipeline Studio",
+  assets: "Assets",
+  executions: "Executions",
   dashboard: "Dashboard",
-  sessions: "Session Explorer",
-  evidence: "Evidence Explorer",
-  "rule-intelligence": "Rule Intelligence",
-  rules: "Rule Studio",
-  plugins: "Plugin Marketplace",
-  graph: "Graph Intelligence",
-  temporal: "Temporal Intelligence",
-  brain: "Coherence Brain",
-  "session-validation": "Session Validation Studio",
-  replay: "Replay Studio",
-  model: "Model Studio",
-  copilot: "AI Copilot",
+  governance: "Governance",
+  marketplace: "Marketplace",
   admin: "Administration",
+  sessions: "Session Explorer",
 };
 
 export function Breadcrumbs() {
   const { pathname } = useLocation();
   const parts = pathname.split("/").filter(Boolean);
 
-  const crumbs: { label: string; path?: string }[] = [{ label: "CoherenceIQ", path: "/dashboard" }];
+  const crumbs: { label: string; path?: string }[] = [{ label: "CoherenceIQ", path: "/pipelines" }];
   parts.forEach((p, i) => {
     const isSessionId = i === 1 && parts[0] === "sessions" && p.startsWith("S-");
     if (isSessionId) {
