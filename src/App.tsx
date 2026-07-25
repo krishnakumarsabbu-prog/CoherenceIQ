@@ -8,6 +8,8 @@ import { NodeRegistryPage } from "@/pages/NodeRegistryPage";
 import { AssetsPage } from "@/pages/AssetsPage";
 import { ExecutionsPage } from "@/pages/ExecutionsPage";
 import { ComparisonStudioPage } from "@/pages/ComparisonStudioPage";
+import { DatasetBuilderPage } from "@/pages/DatasetBuilderPage";
+import { ModelStudioPage } from "@/pages/ModelStudioPage";
 import { GovernancePage } from "@/pages/GovernancePage";
 import { MarketplacePage } from "@/pages/MarketplacePage";
 import { AdministrationPage } from "@/pages/AdministrationPage";
@@ -36,6 +38,8 @@ export default function App() {
         <Route path="assets" element={<AssetsPage />} />
         <Route path="executions" element={<ExecutionsPage />} />
         <Route path="compare" element={<ComparisonStudioPage />} />
+        <Route path="datasets" element={<DatasetBuilderPage />} />
+        <Route path="models" element={<ModelStudioPage />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="governance" element={<GovernancePage />} />
         <Route path="marketplace" element={<MarketplacePage />} />
