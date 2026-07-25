@@ -1,17 +1,13 @@
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { Layers3, Boxes, Workflow } from "lucide-react";
+import { Layers3, Boxes } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/rulestudio/RuleStudioTabs";
-import { PageHeader } from "@/components/shell/Breadcrumbs";
-import { Badge } from "@/components/ui/badge";
 import { ruleIntelligenceApi, type RuleRecord } from "@/lib/ruleIntelligenceData";
 import { RuleCatalog } from "@/components/ruleintelligence/RuleCatalog";
 import { RuleClustering } from "@/components/ruleintelligence/RuleClustering";
-import { FeatureEngineering } from "@/components/ruleintelligence/FeatureEngineering";
 import { RuleDetailsDrawer } from "@/components/ruleintelligence/RuleDetailsDrawer";
 
-type Tab = "catalog" | "clustering" | "features";
+type Tab = "catalog" | "clustering";
 
 export function RuleIntelligencePage() {
   const [tab, setTab] = useState<Tab>("catalog");
@@ -47,7 +43,6 @@ export function RuleIntelligencePage() {
           <TabsList>
             <TabsTrigger value="catalog"><Layers3 className="h-3.5 w-3.5" /> Rule Catalog</TabsTrigger>
             <TabsTrigger value="clustering"><Boxes className="h-3.5 w-3.5" /> Rule Clustering</TabsTrigger>
-            <TabsTrigger value="features"><Workflow className="h-3.5 w-3.5" /> Feature Engineering</TabsTrigger>
           </TabsList>
         </div>
 
@@ -59,9 +54,6 @@ export function RuleIntelligencePage() {
           <RuleClustering selectedCluster={selectedCluster} onSelectCluster={setSelectedCluster} />
         </TabsContent>
 
-        <TabsContent value="features" className="flex-1 overflow-hidden p-5 lg:p-6">
-          <FeatureEngineering />
-        </TabsContent>
       </Tabs>
 
       <RuleDetailsDrawer rule={selectedRule} open={drawerOpen} onClose={() => setDrawerOpen(false)} />

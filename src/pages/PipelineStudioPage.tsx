@@ -6,11 +6,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Play, Save, Plus, Copy, Trash2, Sparkles, History, ChevronDown, GitCommit,
-  LayoutGrid, Clipboard, ClipboardCheck, Undo2, Redo2, MessageSquarePlus,
-  CheckCircle2, AlertCircle, AlertTriangle, FolderPlus, Search, Pencil,
-} from "lucide-react";
+import { Play, Save, Plus, Copy, Trash2, Sparkles, History, ChevronDown, GitCommitVertical as GitCommit, LayoutGrid, Clipboard, ClipboardCheck, Undo2, Redo2, MessageSquarePlus, CircleCheck as CheckCircle2, CircleAlert as AlertCircle, TriangleAlert as AlertTriangle, FolderPlus, Search, Pencil } from "lucide-react";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -654,5 +650,3 @@ function PipelineMenu({ onClone, onDelete, onRename }: { onClone: () => void; on
     </div>
   );
 }
-
-export { PipelineStudioPage }
