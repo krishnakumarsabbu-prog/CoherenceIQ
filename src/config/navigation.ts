@@ -3,6 +3,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+// Sparkles is reused for the Copilot module below.
+
 export interface NavModule {
   id: string;
   label: string;
@@ -22,6 +24,7 @@ export const NAV_MODULES: NavModule[] = [
   { id: "dataset-builder", label: "Dataset Builder", path: "/datasets", icon: Database, group: "Build", description: "Transform historical login sessions into ML datasets with auto-generated signals and engineered features" },
   { id: "coherence-brain", label: "Coherence Brain", path: "/brain", icon: Brain, group: "Build", description: "Enterprise decision orchestration engine — fuse all evidence domains into ALLOW, CHALLENGE, or DENY with full explainability" },
   { id: "model-studio", label: "Model Studio", path: "/models", icon: Cpu, group: "Build", description: "Train, evaluate, and version ML models — reusable assets attachable to any pipeline" },
+  { id: "ai-copilot", label: "AI Copilot", path: "/copilot", icon: Sparkles, group: "Build", description: "Conversational fraud-detection architect — design pipelines, recommend models, and generate governance docs", badge: "AI" },
   { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, group: "Operate", description: "Executive risk overview & KPIs" },
   { id: "governance", label: "Governance", path: "/governance", icon: Gavel, group: "Govern", description: "Rule intelligence, rule authoring, and session validation" },
   { id: "marketplace", label: "Marketplace", path: "/marketplace", icon: Store, group: "Govern", description: "Install detection plugins and pipeline templates" },

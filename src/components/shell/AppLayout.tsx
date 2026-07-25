@@ -89,7 +89,7 @@ export function AppLayout() {
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} onAction={handleAction} />
       {!copilotOpen && <CopilotDockEdge onOpen={() => setCopilotOpen(true)} />}
       <ErrorBoundary fallbackTitle="Copilot Error">
-        <CopilotPanel open={copilotOpen} onOpenChange={setCopilotOpen} contextSession={contextSession} variant="docked" />
+        <CopilotPanel open={copilotOpen} onOpenChange={setCopilotOpen} variant="docked" />
       </ErrorBoundary>
     </div>
   );

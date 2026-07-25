@@ -11,6 +11,7 @@ import { ComparisonStudioPage } from "@/pages/ComparisonStudioPage";
 import { DatasetBuilderPage } from "@/pages/DatasetBuilderPage";
 import { ModelStudioPage } from "@/pages/ModelStudioPage";
 import { CoherenceBrainPage } from "@/pages/CoherenceBrainPage";
+import { CopilotPage } from "@/pages/CopilotPage";
 import { GovernancePage } from "@/pages/GovernancePage";
 import { MarketplacePage } from "@/pages/MarketplacePage";
 import { AdministrationPage } from "@/pages/AdministrationPage";
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="datasets" element={<DatasetBuilderPage />} />
         <Route path="models" element={<ModelStudioPage />} />
         <Route path="brain" element={<CoherenceBrainPage />} />
+        <Route path="copilot" element={<CopilotPage />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="governance" element={<GovernancePage />} />
         <Route path="marketplace" element={<MarketplacePage />} />
