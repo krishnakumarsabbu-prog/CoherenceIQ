@@ -55,11 +55,14 @@ def exec_rule_intelligence(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -
     rules = rng.randint(50, 500)
     clusters = rng.randint(8, 18)
     features = rng.randint(18, 28)
+    triggered = rng.randint(5, min(rules, 80))
+    signals = rng.randint(3, clusters + 4)
     return _base_result(node, rules, [
         f"Parsed {rules} rules",
         f"{clusters} clusters detected",
         f"{features} features engineered",
-    ], {"rules": rules, "clusters": clusters, "features": features})
+        f"{triggered} rules triggered, {signals} signals generated",
+    ], {"rules": rules, "clusters": clusters, "features": features, "triggered_rules": triggered, "signals": signals})
 
 
 def exec_rule_clustering(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -113,10 +116,14 @@ def exec_coherence_brain(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> 
     threshold = float(cfg.get("threshold", 0.5))
     rng = _seed_from(node["id"])
     avg = round(rng.uniform(0.55, 0.92), 3)
+    fraud_prob = round(1.0 - avg, 3)
+    risk_score = int(round(fraud_prob * 100))
     return _base_result(node, rows_in or 412, [
         "Inference complete",
         f"Average coherence {avg}",
-    ], {"avg_coherence": avg, "threshold": threshold})
+        f"Fraud probability {fraud_prob}",
+        f"Risk score {risk_score}",
+    ], {"avg_coherence": avg, "threshold": threshold, "fraud_probability": fraud_prob, "risk_score": risk_score})
 
 
 def exec_model_studio(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -125,19 +132,33 @@ def exec_model_studio(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> Dic
     mode = cfg.get("mode", "train")
     rng = _seed_from(node["id"])
     auc = round(rng.uniform(0.90, 0.97), 3)
+    precision = round(rng.uniform(0.88, 0.96), 3)
+    recall = round(rng.uniform(0.85, 0.94), 3)
     return _base_result(node, rows_in or 50000, [
         f"Mode: {mode}, algorithm: {cfg.get('algorithm', 'gradient-boosted')}",
         f"Training complete, AUC {auc}",
-    ], {"auc": auc})
+        f"Precision {precision}, Recall {recall}",
+    ], {"auc": auc, "precision": precision, "recall": recall})
 
 
 def exec_session_validation(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> Dict[str, Any]:
     rows_in = _rows(inputs)
     cfg = node["data"]["config"]
+    rng = _seed_from(node["id"])
+    domain_scores = {
+        "rule": round(rng.uniform(0.70, 0.95), 3),
+        "graph": round(rng.uniform(0.65, 0.92), 3),
+        "temporal": round(rng.uniform(0.68, 0.93), 3),
+        "coherence": round(rng.uniform(0.60, 0.90), 3),
+        "model": round(rng.uniform(0.85, 0.97), 3),
+    }
+    reason_codes = rng.randint(2, 8)
     return _base_result(node, rows_in or 412, [
         f"Strict mode: {cfg.get('strictMode', True)}",
         f"Reason codes emitted: {cfg.get('emitReasonCodes', True)}",
-    ], {"validated": rows_in or 412})
+        f"Domain scores: {', '.join(f'{k}={v}' for k, v in domain_scores.items())}",
+        f"{reason_codes} reason codes generated",
+    ], {"validated": rows_in or 412, "domain_scores": domain_scores, "reason_codes": reason_codes})
 
 
 def exec_rule_studio(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -164,10 +185,12 @@ def exec_ai_copilot(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> Dict[
     cfg = node["data"]["config"]
     rng = _seed_from(node["id"])
     reasons = rng.randint(1, 5)
+    explainability = round(rng.uniform(0.70, 0.95), 3)
     return _base_result(node, rows_in or 1, [
         f"Model: {cfg.get('model', 'gpt-4o')}",
         f"Generated narrative summary, {reasons} reason codes surfaced",
-    ], {"reason_codes": reasons})
+        f"Explainability score: {explainability}",
+    ], {"reason_codes": reasons, "explainability": explainability})
 
 
 def exec_decision_router(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -180,10 +203,12 @@ def exec_decision_router(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> 
     allow = int(total * rng.uniform(0.70, 0.82))
     deny = int(total * rng.uniform(0.05, 0.10))
     challenge = max(0, total - allow - deny)
+    dominant = "Allow" if allow >= challenge and allow >= deny else ("Deny" if deny >= challenge else "Challenge")
     return _base_result(node, total, [
         f"Thresholds: allow<{allow_t}, challenge<{chal_t}",
         f"{allow} allow, {challenge} challenge, {deny} deny",
-    ], {"allow": allow, "challenge": challenge, "deny": deny})
+        f"Dominant decision: {dominant}",
+    ], {"allow": allow, "challenge": challenge, "deny": deny, "dominant": dominant})
 
 
 def exec_webhook_output(node: Dict[str, Any], inputs: List[Dict[str, Any]]) -> Dict[str, Any]:

@@ -11,6 +11,7 @@ from store import RuleStore
 from session_validation import session_validation_service, SAMPLE_PAYLOADS, generate_random_session
 from execution import execution_engine, execution_store
 from execution.seed import seed_sample_pipelines
+from execution.comparison import comparison_engine, comparison_store
 
 
 app = FastAPI(title="Coherence AI — Rule Intelligence", version="1.0.0")
@@ -289,4 +290,50 @@ def stream_events(execution_id: str, after: int = -1) -> StreamingResponse:
                 time.sleep(0.15)
 
     return StreamingResponse(event_gen(), media_type="text/event-stream")
+
+
+# ---------------------------------------------------------------------------
+# Multi-pipeline comparison — REST API
+# ---------------------------------------------------------------------------
+
+class ComparisonRequest(BaseModel):
+    pipelineIds: List[str]
+    inputType: str = "dataset"
+    inputPayload: Optional[str] = None
+    triggeredBy: str = "ui"
+
+
+@app.post("/api/comparisons")
+def create_comparison(body: ComparisonRequest) -> Dict[str, Any]:
+    if not body.pipelineIds:
+        raise HTTPException(status_code=400, detail="Select at least one pipeline")
+    try:
+        return comparison_engine.create_comparison(
+            pipeline_ids=body.pipelineIds,
+            input_type=body.inputType,
+            input_payload=body.inputPayload,
+            triggered_by=body.triggeredBy,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@app.get("/api/comparisons")
+def list_comparisons() -> List[Dict[str, Any]]:
+    return comparison_engine.list_comparisons()
+
+
+@app.get("/api/comparisons/{run_id}")
+def get_comparison(run_id: str) -> Dict[str, Any]:
+    run = comparison_engine.get_comparison(run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail="Comparison not found")
+    return run
+
+
+@app.delete("/api/comparisons/{run_id}")
+def delete_comparison(run_id: str) -> Dict[str, str]:
+    comparison_engine.delete_comparison(run_id)
+    return {"status": "deleted"}
+
 

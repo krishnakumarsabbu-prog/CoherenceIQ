@@ -1,5 +1,5 @@
 import {
-  Workflow, LayoutDashboard, Boxes, Activity, Gavel, Sparkles, Store, Settings, Blocks,
+  Workflow, LayoutDashboard, Boxes, Activity, Gavel, Sparkles, Store, Settings, Blocks, GitCompareArrows,
   type LucideIcon,
 } from "lucide-react";
 
@@ -18,6 +18,7 @@ export const NAV_MODULES: NavModule[] = [
   { id: "node-registry", label: "Node Registry", path: "/nodes", icon: Blocks, group: "Build", description: "Browse every capability as a reusable pipeline node with schemas and metrics" },
   { id: "assets", label: "Assets", path: "/assets", icon: Boxes, group: "Build", description: "Reusable rule sets, models, feature sets, graphs & datasets" },
   { id: "executions", label: "Executions", path: "/executions", icon: Activity, group: "Build", description: "Run history, logs, and per-step results" },
+  { id: "comparison-studio", label: "Comparison Studio", path: "/compare", icon: GitCompareArrows, group: "Build", description: "Execute multiple pipelines in parallel and benchmark results side-by-side" },
   { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, group: "Operate", description: "Executive risk overview & KPIs" },
   { id: "governance", label: "Governance", path: "/governance", icon: Gavel, group: "Govern", description: "Rule intelligence, rule authoring, and session validation" },
   { id: "marketplace", label: "Marketplace", path: "/marketplace", icon: Store, group: "Govern", description: "Install detection plugins and pipeline templates" },
