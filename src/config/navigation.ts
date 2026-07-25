@@ -1,5 +1,5 @@
 import {
-  Workflow, LayoutDashboard, Boxes, Activity, Gavel, Sparkles, Store, Settings, Blocks, GitCompareArrows, Database, Cpu,
+  Workflow, LayoutDashboard, Boxes, Activity, Gavel, Sparkles, Store, Settings, Blocks, GitCompareArrows, Database, Cpu, Brain,
   type LucideIcon,
 } from "lucide-react";
 
@@ -20,6 +20,7 @@ export const NAV_MODULES: NavModule[] = [
   { id: "executions", label: "Executions", path: "/executions", icon: Activity, group: "Build", description: "Run history, logs, and per-step results" },
   { id: "comparison-studio", label: "Comparison Studio", path: "/compare", icon: GitCompareArrows, group: "Build", description: "Execute multiple pipelines in parallel and benchmark results side-by-side" },
   { id: "dataset-builder", label: "Dataset Builder", path: "/datasets", icon: Database, group: "Build", description: "Transform historical login sessions into ML datasets with auto-generated signals and engineered features" },
+  { id: "coherence-brain", label: "Coherence Brain", path: "/brain", icon: Brain, group: "Build", description: "Enterprise decision orchestration engine — fuse all evidence domains into ALLOW, CHALLENGE, or DENY with full explainability" },
   { id: "model-studio", label: "Model Studio", path: "/models", icon: Cpu, group: "Build", description: "Train, evaluate, and version ML models — reusable assets attachable to any pipeline" },
   { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, group: "Operate", description: "Executive risk overview & KPIs" },
   { id: "governance", label: "Governance", path: "/governance", icon: Gavel, group: "Govern", description: "Rule intelligence, rule authoring, and session validation" },
