@@ -3,17 +3,16 @@ import { useAuth } from "@/providers/AuthProvider";
 import { AppLayout } from "@/components/shell/AppLayout";
 import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { RuleIntelligencePage } from "@/pages/RuleIntelligencePage";
+import { FeatureIntelligencePage } from "@/pages/FeatureIntelligencePage";
+import { DatasetBuilderPage } from "@/pages/DatasetBuilderPage";
 import { PipelineStudioPage } from "@/pages/PipelineStudioPage";
-import { NodeRegistryPage } from "@/pages/NodeRegistryPage";
-import { AssetsPage } from "@/pages/AssetsPage";
+import { PipelineComponentsPage } from "@/pages/PipelineComponentsPage";
+import { ModelStudioPage } from "@/pages/ModelStudioPage";
 import { ExecutionsPage } from "@/pages/ExecutionsPage";
 import { ComparisonStudioPage } from "@/pages/ComparisonStudioPage";
-import { DatasetBuilderPage } from "@/pages/DatasetBuilderPage";
-import { ModelStudioPage } from "@/pages/ModelStudioPage";
 import { CoherenceBrainPage } from "@/pages/CoherenceBrainPage";
 import { CopilotPage } from "@/pages/CopilotPage";
-import { GovernancePage } from "@/pages/GovernancePage";
-import { MarketplacePage } from "@/pages/MarketplacePage";
 import { AdministrationPage } from "@/pages/AdministrationPage";
 import { SessionInvestigationPage } from "@/pages/SessionInvestigationPage";
 
@@ -34,23 +33,22 @@ export default function App() {
           </Protected>
         }
       >
-        <Route index element={<Navigate to="/pipelines" replace />} />
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="rules" element={<RuleIntelligencePage />} />
+        <Route path="features" element={<FeatureIntelligencePage />} />
+        <Route path="datasets" element={<DatasetBuilderPage />} />
         <Route path="pipelines" element={<PipelineStudioPage />} />
-        <Route path="nodes" element={<NodeRegistryPage />} />
-        <Route path="assets" element={<AssetsPage />} />
+        <Route path="components" element={<PipelineComponentsPage />} />
+        <Route path="models" element={<ModelStudioPage />} />
         <Route path="executions" element={<ExecutionsPage />} />
         <Route path="compare" element={<ComparisonStudioPage />} />
-        <Route path="datasets" element={<DatasetBuilderPage />} />
-        <Route path="models" element={<ModelStudioPage />} />
         <Route path="brain" element={<CoherenceBrainPage />} />
         <Route path="copilot" element={<CopilotPage />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="governance" element={<GovernancePage />} />
-        <Route path="marketplace" element={<MarketplacePage />} />
         <Route path="admin" element={<AdministrationPage />} />
         <Route path="sessions/:id" element={<SessionInvestigationPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/pipelines" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }

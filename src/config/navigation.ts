@@ -1,9 +1,8 @@
 import {
-  Workflow, LayoutDashboard, Boxes, Activity, Gavel, Sparkles, Store, Settings, Blocks, GitCompareArrows, Database, Cpu, Brain,
+  LayoutDashboard, Layers3, Workflow, Blocks, Cpu, Activity,
+  GitCompareArrows, Brain, Sparkles, Settings, Database, Boxes,
   type LucideIcon,
 } from "lucide-react";
-
-// Sparkles is reused for the Copilot module below.
 
 export interface NavModule {
   id: string;
@@ -16,18 +15,17 @@ export interface NavModule {
 }
 
 export const NAV_MODULES: NavModule[] = [
-  { id: "pipeline-studio", label: "Pipeline Studio", path: "/pipelines", icon: Workflow, group: "Build", description: "Design and run executable pipelines on a visual canvas" },
-  { id: "node-registry", label: "Node Registry", path: "/nodes", icon: Blocks, group: "Build", description: "Browse every capability as a reusable pipeline node with schemas and metrics" },
-  { id: "assets", label: "Assets", path: "/assets", icon: Boxes, group: "Build", description: "Reusable rule sets, models, feature sets, graphs & datasets" },
-  { id: "executions", label: "Executions", path: "/executions", icon: Activity, group: "Build", description: "Run history, logs, and per-step results" },
-  { id: "comparison-studio", label: "Comparison Studio", path: "/compare", icon: GitCompareArrows, group: "Build", description: "Execute multiple pipelines in parallel and benchmark results side-by-side" },
-  { id: "dataset-builder", label: "Dataset Builder", path: "/datasets", icon: Database, group: "Build", description: "Transform historical login sessions into ML datasets with auto-generated signals and engineered features" },
-  { id: "coherence-brain", label: "Coherence Brain", path: "/brain", icon: Brain, group: "Build", description: "Enterprise decision orchestration engine — fuse all evidence domains into ALLOW, CHALLENGE, or DENY with full explainability" },
-  { id: "model-studio", label: "Model Studio", path: "/models", icon: Cpu, group: "Build", description: "Train, evaluate, and version ML models — reusable assets attachable to any pipeline" },
-  { id: "ai-copilot", label: "AI Copilot", path: "/copilot", icon: Sparkles, group: "Build", description: "Conversational fraud-detection architect — design pipelines, recommend models, and generate governance docs", badge: "AI" },
-  { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, group: "Operate", description: "Executive risk overview & KPIs" },
-  { id: "governance", label: "Governance", path: "/governance", icon: Gavel, group: "Govern", description: "Rule intelligence, rule authoring, and session validation" },
-  { id: "marketplace", label: "Marketplace", path: "/marketplace", icon: Store, group: "Govern", description: "Install detection plugins and pipeline templates" },
+  { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, group: "Operate", description: "Executive fraud risk overview & KPIs across all pipelines" },
+  { id: "rule-intelligence", label: "Rule Intelligence", path: "/rules", icon: Layers3, group: "Build", description: "Upload, parse, and cluster fraud detection rules" },
+  { id: "feature-intelligence", label: "Feature Intelligence", path: "/features", icon: Boxes, group: "Build", description: "Generate and engineer ML features from rule clusters" },
+  { id: "dataset-builder", label: "Dataset Builder", path: "/datasets", icon: Database, group: "Build", description: "Build ML datasets from features with encoding, scaling, and sampling" },
+  { id: "pipeline-studio", label: "Pipeline Studio", path: "/pipelines", icon: Workflow, group: "Build", description: "Design and run executable fraud pipelines on a visual canvas" },
+  { id: "pipeline-components", label: "Pipeline Components", path: "/components", icon: Blocks, group: "Build", description: "Library of reusable pipeline nodes — drag directly into Pipeline Studio" },
+  { id: "model-studio", label: "Model Studio", path: "/models", icon: Cpu, group: "Build", description: "Train, evaluate, and version ML models — reusable across pipelines" },
+  { id: "executions", label: "Executions", path: "/executions", icon: Activity, group: "Build", description: "Run pipelines against sessions, batches, replays, CSV, JSON, or API" },
+  { id: "comparison-studio", label: "Comparison Studio", path: "/compare", icon: GitCompareArrows, group: "Build", description: "Compare unlimited pipelines with metrics, charts, and rankings" },
+  { id: "coherence-brain", label: "Coherence Brain", path: "/brain", icon: Brain, group: "Build", description: "Final orchestration engine — fuse all models into ALLOW, CHALLENGE, DENY, BLOCK" },
+  { id: "ai-copilot", label: "AI Copilot", path: "/copilot", icon: Sparkles, group: "Build", description: "AI assistant — suggest clusters, features, models, and pipeline improvements", badge: "AI" },
   { id: "administration", label: "Administration", path: "/admin", icon: Settings, group: "Govern", description: "Tenant, users, and environment management" },
 ];
 

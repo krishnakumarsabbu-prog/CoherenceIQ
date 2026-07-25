@@ -212,26 +212,42 @@ export function RuleCatalog({ onRowSelect }: Props) {
       <Modal open={uploadOpen} onClose={() => setUploadOpen(false)} className="max-w-2xl">
         <div className="p-5">
           <h3 className="text-base font-semibold text-foreground">Upload Rule Files</h3>
-          <p className="mt-1 text-[12px] text-muted-foreground">Upload Markdown files following the Rule Name / Rule Description / Parameter Count / Parameters structure.</p>
+          <p className="mt-1 text-[12px] text-muted-foreground">Upload rule files in Markdown, Text, JSON, XML, or CSV format. Rules are parsed and clustered automatically.</p>
 
           <label className="mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-card/40 px-4 py-8 text-center transition-colors hover:border-primary/50 hover:bg-primary/5">
             <FileUp className="h-6 w-6 text-primary" />
-            <span className="text-[12px] font-medium text-foreground">Click to select one or more .md files</span>
-            <span className="text-[10.5px] text-muted-foreground">They will be parsed and clustered automatically</span>
-            <input type="file" multiple accept=".md,.markdown" className="hidden" onChange={onFilePicked} />
+            <span className="text-[12px] font-medium text-foreground">Click to select rule files</span>
+            <span className="text-[10.5px] text-muted-foreground">Supports .md, .txt, .json, .xml, .csv — parsed and clustered automatically</span>
+            <input type="file" multiple accept=".md,.markdown,.txt,.json,.xml,.csv" className="hidden" onChange={onFilePicked} />
           </label>
 
           <div className="my-4 flex items-center gap-3">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">or paste markdown</span>
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">or paste rules</span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
+          <div className="mb-2 flex gap-2">
+            {(["markdown", "text", "json", "xml", "csv"] as const).map((fmt) => (
+              <button
+                key={fmt}
+                onClick={() => setUploadName(`rules.${fmt === "markdown" ? "md" : fmt}`)}
+                className={cn(
+                  "rounded-md px-2.5 py-1 text-[10.5px] font-medium transition-colors",
+                  uploadName.endsWith(fmt === "markdown" ? "md" : fmt)
+                    ? "bg-primary/15 text-primary"
+                    : "bg-muted text-muted-foreground hover:bg-accent",
+                )}
+              >
+                {fmt.toUpperCase()}
+              </button>
+            ))}
+          </div>
           <Input value={uploadName} onChange={(e) => setUploadName(e.target.value)} placeholder="filename.md" className="mb-2 h-8 text-[12px]" />
           <textarea
             value={uploadText}
             onChange={(e) => setUploadText(e.target.value)}
-            placeholder={"Rule Name\nALERT_...\n\nRule Description\n...\n\nParameter Count\n3\n\nParameters\nParam A\nParam B\nParam C"}
+            placeholder={"Paste rule content here. The format is auto-detected from the filename extension.\n\nMarkdown example:\n## Rule Name\nDescription with thresholds and parameters...\n\nJSON example:\n[{\"rule_name\": \"...\", \"description\": \"...\"}]"}
             className="h-40 w-full resize-none rounded-md border border-border bg-background/60 p-3 font-mono text-[11px] text-foreground outline-none focus:border-primary"
           />
           <div className="mt-3 flex items-center justify-end gap-2">
