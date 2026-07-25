@@ -655,5 +655,4 @@ function PipelineMenu({ onClone, onDelete, onRename }: { onClone: () => void; on
   );
 }
 
-
 export { PipelineStudioPage }
