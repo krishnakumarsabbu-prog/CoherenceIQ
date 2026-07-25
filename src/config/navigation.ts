@@ -1,5 +1,5 @@
 import {
-  Workflow, LayoutDashboard, Boxes, Activity, Gavel, Sparkles, Store, Settings,
+  Workflow, LayoutDashboard, Boxes, Activity, Gavel, Sparkles, Store, Settings, Blocks,
   type LucideIcon,
 } from "lucide-react";
 
@@ -15,6 +15,7 @@ export interface NavModule {
 
 export const NAV_MODULES: NavModule[] = [
   { id: "pipeline-studio", label: "Pipeline Studio", path: "/pipelines", icon: Workflow, group: "Build", description: "Design and run executable pipelines on a visual canvas" },
+  { id: "node-registry", label: "Node Registry", path: "/nodes", icon: Blocks, group: "Build", description: "Browse every capability as a reusable pipeline node with schemas and metrics" },
   { id: "assets", label: "Assets", path: "/assets", icon: Boxes, group: "Build", description: "Reusable rule sets, models, feature sets, graphs & datasets" },
   { id: "executions", label: "Executions", path: "/executions", icon: Activity, group: "Build", description: "Run history, logs, and per-step results" },
   { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, group: "Operate", description: "Executive risk overview & KPIs" },

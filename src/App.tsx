@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/shell/AppLayout";
 import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { PipelineStudioPage } from "@/pages/PipelineStudioPage";
+import { NodeRegistryPage } from "@/pages/NodeRegistryPage";
 import { AssetsPage } from "@/pages/AssetsPage";
 import { ExecutionsPage } from "@/pages/ExecutionsPage";
 import { GovernancePage } from "@/pages/GovernancePage";
@@ -30,6 +31,7 @@ export default function App() {
       >
         <Route index element={<Navigate to="/pipelines" replace />} />
         <Route path="pipelines" element={<PipelineStudioPage />} />
+        <Route path="nodes" element={<NodeRegistryPage />} />
         <Route path="assets" element={<AssetsPage />} />
         <Route path="executions" element={<ExecutionsPage />} />
         <Route path="dashboard" element={<DashboardPage />} />
